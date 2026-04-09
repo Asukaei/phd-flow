@@ -13,9 +13,15 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#9fbcdb', secondary: '#bbaecc', accent: '#eecba8',
-                        success: '#a6cbb5', warning: '#ebd59a', danger: '#e0a2a2',
-                        bglight: '#f5f6f8', textmain: '#4a4a59', textmuted: '#8e8e9e'
+                        primary: '#9fbcdb',    /* 柔和蓝 - 学习/打卡 */
+                        secondary: '#bbaecc',  /* 丁香紫 - 科研/任务 */
+                        accent: '#eecba8',     /* 蜜桃橙 - 娱乐/复盘 */
+                        success: '#a6cbb5',    /* 莫兰迪绿 - 休息/习惯 */
+                        warning: '#ebd59a',    /* 柔和黄 - 餐饮/成就 */
+                        danger: '#e0a2a2',     /* 脏粉红 - 摸鱼/克制 */
+                        bglight: '#f5f6f8',
+                        textmain: '#4a4a59',
+                        textmuted: '#8e8e9e'
                     },
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], },
                 }
@@ -37,7 +43,7 @@
         ::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #bbaecc; }
 
-        /* 关键修复2：iOS 特供补丁 */
+        /* iOS 特供补丁 */
         @supports (padding-top: env(safe-area-inset-top)) {
             body {
                 padding-top: max(1rem, env(safe-area-inset-top));
@@ -48,11 +54,10 @@
         }
         /* 强制所有输入框字体大于 16px，彻底杜绝 iOS 自动放大页面破坏布局 */
         input, select, textarea { font-size: 16px !important; }
-        /* 消除 iOS 按钮点击时的灰色闪烁 */
         * { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-bglight text-textmain font-sans min-h-screen">
+<body class="bg-bglight text-textmain font-sans min-h-screen pb-20">
     <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-[1200px]">
         
         <header class="mb-6 sm:mb-10 text-center">
@@ -66,7 +71,7 @@
                     <ul class="grid grid-cols-2 gap-2 md:grid-cols-1 md:block md:space-y-3">
                         <li><button id="nav-checkin" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl bg-primary text-white font-bold flex items-center justify-between shadow-md text-sm md:text-base"><span class="tracking-wide">工位起居</span><i class="fa fa-clock-o text-lg"></i></button></li>
                         <li><button id="nav-hourly" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">时间日历</span><i class="fa fa-calendar text-lg text-primary"></i></button></li>
-                        <li><button id="nav-tasks" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">深度专注</span><i class="fa fa-tasks text-lg text-secondary"></i></button></li>
+                        <li><button id="nav-tasks" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">Todo专注</span><i class="fa fa-tasks text-lg text-secondary"></i></button></li>
                         <li><button id="nav-habits" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">每日习惯</span><i class="fa fa-check-square-o text-lg text-success"></i></button></li>
                         <li><button id="nav-journal" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">每日复盘</span><i class="fa fa-book text-lg text-accent"></i></button></li>
                         <li><button id="nav-phone" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">克制诱惑</span><i class="fa fa-mobile text-lg text-danger"></i></button></li>
@@ -99,13 +104,11 @@
                     <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col md:flex-row gap-4 sm:gap-6">
                         <div class="flex-1 bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm text-center">
                             <h3 class="font-bold text-textmain mb-1"><i class="fa fa-sun-o text-warning mr-2"></i>起床打卡</h3>
-                            <p class="text-xs text-textmuted mb-4 hidden sm:block">达标时间：<span class="font-bold text-gray-700">09:00 前</span></p>
                             <button id="btn-wake" class="bg-warning text-white font-bold py-2 sm:py-3 px-6 rounded-lg shadow-sm hover:bg-yellow-400 transition-all w-full mb-2 sm:mb-3">我起床啦</button>
                             <div class="text-xs sm:text-sm font-bold text-gray-500" id="wake-time-display">-</div>
                         </div>
                         <div class="flex-1 bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm text-center">
                             <h3 class="font-bold text-textmain mb-1"><i class="fa fa-moon-o text-secondary mr-2"></i>睡觉打卡</h3>
-                            <p class="text-xs text-textmuted mb-4 hidden sm:block">达标时间：<span class="font-bold text-gray-700">23:30 前</span></p>
                             <button id="btn-sleep" class="bg-secondary text-white font-bold py-2 sm:py-3 px-6 rounded-lg shadow-sm hover:bg-purple-400 transition-all w-full mb-2 sm:mb-3">我要睡了</button>
                             <div class="text-xs sm:text-sm font-bold text-gray-500" id="sleep-time-display">-</div>
                         </div>
@@ -143,28 +146,18 @@
                             <table class="min-w-[500px] sm:min-w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 bg-gray-50 uppercase font-bold">
                                     <tr>
-                                        <th class="px-4 sm:px-6 py-3">时段</th>
-                                        <th class="px-4 sm:px-6 py-3">规定上班</th>
-                                        <th class="px-4 sm:px-6 py-3">规定下班</th>
-                                        <th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th>
-                                        <th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th>
+                                        <th class="px-4 sm:px-6 py-3">时段</th><th class="px-4 sm:px-6 py-3">规定上班</th><th class="px-4 sm:px-6 py-3">规定下班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="today-checkin-table">
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">上午</td>
-                                        <td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">06:00-12:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-14:00</td>
-                                        <td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-out">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">上午</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">06:00-12:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-14:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-out">-</td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">下午</td>
-                                        <td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">12:00-17:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">14:00-20:00</td>
-                                        <td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-out">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">下午</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">12:00-17:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">14:00-20:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-out">-</td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">晚上</td>
-                                        <td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">17:00-22:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00-24:00</td>
-                                        <td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-out">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">晚上</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">17:00-22:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00-24:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-out">-</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -184,12 +177,6 @@
                             <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
                         </div>
                         <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center" id="cal-grid"></div>
-                        
-                        <div class="mt-4 sm:mt-6 flex flex-wrap justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs font-bold text-gray-500 bg-gray-50 py-2 sm:py-3 rounded-xl border border-gray-100">
-                            <div class="flex items-center"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-warning rounded-full mr-1 sm:mr-1.5"></span>早起</div>
-                            <div class="flex items-center"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-secondary rounded-full mr-1 sm:mr-1.5"></span>早睡</div>
-                            <div class="flex items-center"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full mr-1 sm:mr-1.5"></span>工位</div>
-                        </div>
                     </div>
                 </section>
 
@@ -246,36 +233,40 @@
                 </section>
 
                 <section id="tasks-section" class="soft-card p-5 sm:p-8 mb-6 hidden">
-                    <h2 class="text-xl sm:text-2xl font-black text-textmain mb-6 sm:mb-8 border-b border-gray-100 pb-3 sm:pb-4"><i class="fa fa-tasks mr-3 text-secondary text-2xl sm:text-3xl"></i>深度专注</h2>
+                    <h2 class="text-xl sm:text-2xl font-black text-textmain mb-6 sm:mb-8 border-b border-gray-100 pb-3 sm:pb-4"><i class="fa fa-tasks mr-3 text-secondary text-2xl sm:text-3xl"></i>Todo与专注</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-                        <div class="lg:col-span-5 space-y-4 sm:space-y-6">
+                        <div class="lg:col-span-6 space-y-4 sm:space-y-6">
                             <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-200">
-                                <h3 class="text-base sm:text-lg font-bold text-textmain mb-3 sm:mb-4"><i class="fa fa-list-ul text-secondary mr-2"></i>今日任务</h3>
+                                <h3 class="text-base sm:text-lg font-bold text-textmain mb-3 sm:mb-4 flex items-center justify-between">
+                                    <span><i class="fa fa-list-ul text-secondary mr-2"></i>每日待办清单</span>
+                                </h3>
                                 <div class="flex gap-2 mb-4">
-                                    <input type="text" id="new-todo-input" placeholder="输入新任务..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm">
-                                    <button id="btn-add-todo" class="bg-secondary text-white px-4 py-2 rounded-lg font-bold shadow-sm">添加</button>
+                                    <input type="text" id="new-todo-input" placeholder="输入待办事项，按回车添加..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-secondary">
+                                    <button id="btn-add-todo" class="bg-secondary text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-transform active:scale-95 text-sm shrink-0">添加</button>
                                 </div>
-                                <div id="todo-list-container" class="space-y-2 max-h-[200px] overflow-y-auto pr-2"></div>
-                            </div>
-                            <div id="current-task-container" class="bg-white border-2 border-secondary rounded-2xl p-5 sm:p-6 hidden shadow-lg">
-                                <div class="flex flex-col items-center text-center">
-                                    <span class="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2 sm:mb-3">● 心流状态</span>
-                                    <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
-                                    <div class="text-3xl sm:text-4xl font-black text-secondary mt-1 mb-3 sm:mb-4 font-mono tracking-wider" id="current-task-time">00:00:00</div>
-                                    <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow">结束并记录</button>
-                                </div>
+                                <div id="todo-list-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                                    </div>
                             </div>
                         </div>
-                        <div class="lg:col-span-7">
-                            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm min-h-full">
-                                <h3 class="text-lg sm:text-xl font-black text-textmain mb-4 sm:mb-6 border-b border-gray-50 pb-3 sm:pb-4"><i class="fa fa-clock-o text-secondary mr-2"></i>今日记录</h3>
+
+                        <div class="lg:col-span-6 space-y-4 sm:space-y-6">
+                            <div id="current-task-container" class="bg-white border-2 border-secondary rounded-2xl p-5 sm:p-6 hidden shadow-lg">
+                                <div class="flex flex-col items-center text-center">
+                                    <span class="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2 sm:mb-3">● 正在专注心流</span>
+                                    <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
+                                    <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 mb-3 sm:mb-4 font-mono tracking-wider" id="current-task-time">00:00:00</div>
+                                    <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow transition-transform active:scale-95">结束专注并记录时间</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm min-h-[250px]">
+                                <h3 class="text-base sm:text-lg font-black text-textmain mb-4 sm:mb-6 border-b border-gray-50 pb-3 sm:pb-4"><i class="fa fa-clock-o text-secondary mr-2"></i>今日专注时间线</h3>
                                 <div id="today-tasks-timeline" class="relative border-l-2 border-secondary/20 ml-2 sm:ml-4 pl-4 sm:pl-6 space-y-4 sm:space-y-6"></div>
-                                <div id="empty-timeline-msg" class="text-center text-textmuted font-bold py-10 hidden text-sm">暂无专注记录</div>
+                                <div id="empty-timeline-msg" class="text-center text-textmuted font-bold py-10 hidden text-sm">今日还未开启专注，快去右侧点播放键吧！</div>
                             </div>
                         </div>
                     </div>
                 </section>
-
                 <section id="habits-section" class="soft-card p-5 sm:p-8 mb-6 hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 border-b border-gray-100 pb-3 sm:pb-4">
                         <h2 class="text-xl sm:text-2xl font-black text-textmain"><i class="fa fa-check-square-o mr-3 text-success text-2xl sm:text-3xl"></i>每日习惯</h2>
@@ -402,7 +393,7 @@
     </div>
 
     <script>
-        // ================= 数据初始化与工具函数（保持你原本的完整逻辑） =================
+        // ================= 数据初始化与工具函数 =================
         const getTodayStr = (offset=0) => { const d = new Date(); d.setDate(d.getDate() + offset); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         const getTimeStr = () => { const d = new Date(); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
         
@@ -480,7 +471,6 @@
             if(typeof updateSidebar === 'function') updateSidebar(); 
         }
 
-        // ================= 业务逻辑绑定 (精简版展示，与原版完全一致) =================
         function initNavigation() {
             const sections = ['checkin', 'hourly', 'tasks', 'habits', 'journal', 'phone', 'achievements', 'stats', 'sync'];
             sections.forEach(sec => {
@@ -550,25 +540,146 @@
             }
         }
 
-        // 同步、专注、复盘等基础逻辑与原版一致，略缩写保证可用性
+        // ================= Todo 核心强化部分 =================
+        function initTasks() {
+            const addBtn = document.getElementById('btn-add-todo');
+            const input = document.getElementById('new-todo-input');
+            
+            // 封装添加任务逻辑
+            const addTodo = () => {
+                const name = input.value.trim(); 
+                if(name){ 
+                    const t = getTodayStr(); ensureDateDataExists(t);
+                    D.todoData[t].push({id:'td_'+Date.now(), name:name, done:false}); 
+                    input.value = ''; 
+                    saveData(); 
+                    renderTodos(); 
+                }
+            };
+
+            // 绑定按钮点击和回车事件
+            addBtn.onclick = addTodo;
+            input.onkeypress = (e) => { if(e.key === 'Enter') addTodo(); };
+
+            // 结束专注逻辑
+            document.getElementById('end-task').onclick = () => { 
+                if(currentTask){ 
+                    clearInterval(taskTimer); 
+                    const t = getTodayStr(); ensureDateDataExists(t);
+                    D.taskData[t].push({
+                        id: 't_' + Date.now(), 
+                        name: currentTask.name, 
+                        startTime: currentTask.startTime, 
+                        endTime: getTimeStr(), 
+                        duration: Math.floor((Date.now() - currentTask.startTimestamp) / 60000)
+                    }); 
+                    currentTask = null; 
+                    document.getElementById('current-task-container').classList.add('hidden'); 
+                    saveData(); 
+                    renderTodayTasksTimeline(); 
+                }
+            };
+        }
+
+        // 渲染增强版 Todo List
+        function renderTodos() { 
+            const container = document.getElementById('todo-list-container'); 
+            container.innerHTML = ''; 
+            const todayTodos = D.todoData[getTodayStr()] || [];
+            
+            if (todayTodos.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">今天还没有安排任务哦</div>';
+                return;
+            }
+
+            todayTodos.forEach(t => { 
+                container.innerHTML += `
+                <div class="flex items-center justify-between p-2.5 sm:p-3 bg-white rounded-xl border border-gray-100 shadow-sm mb-2 group transition-all hover:border-secondary/30">
+                    <label class="flex items-center cursor-pointer flex-1 truncate mr-2">
+                        <input type="checkbox" class="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded checked:bg-secondary checked:border-secondary transition-all cursor-pointer mr-3 flex-shrink-0" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}')">
+                        <span class="font-bold text-sm text-textmain peer-checked:line-through peer-checked:text-gray-400 truncate transition-all" title="${t.name}">${t.name}</span>
+                    </label>
+                    <div class="flex items-center gap-1">
+                        <button onclick="startTask('${t.name}')" class="text-secondary hover:bg-secondary hover:text-white w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="开始心流专注">
+                            <i class="fa fa-play text-xs sm:text-sm"></i>
+                        </button>
+                        <button onclick="deleteTodo('${t.id}')" class="text-gray-300 hover:text-danger hover:bg-danger/10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="删除任务">
+                            <i class="fa fa-trash text-xs sm:text-sm"></i>
+                        </button>
+                    </div>
+                </div>`; 
+            }); 
+        }
+
+        // 全局方法：切换待办完成状态
+        window.toggleTodo = function(id) {
+            const t = getTodayStr();
+            const todo = D.todoData[t].find(x => x.id === id);
+            if (todo) {
+                todo.done = !todo.done;
+                saveData();
+                renderTodos();
+            }
+        };
+
+        // 全局方法：删除待办
+        window.deleteTodo = function(id) {
+            const t = getTodayStr();
+            D.todoData[t] = D.todoData[t].filter(x => x.id !== id);
+            saveData();
+            renderTodos();
+        };
+
+        window.startTask = n => { 
+            currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now()}; 
+            document.getElementById('current-task-name').textContent = n; 
+            document.getElementById('current-task-container').classList.remove('hidden'); 
+            updateSidebar();
+            taskTimer = setInterval(() => {
+                const e = Date.now() - currentTask.startTimestamp; 
+                document.getElementById('current-task-time').textContent = `${String(Math.floor(e/3600000)).padStart(2,'0')}:${String(Math.floor((e%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((e%60000)/1000)).padStart(2,'0')}`;
+            }, 1000); 
+        };
+
+        function renderTodayTasksTimeline() { 
+            const container = document.getElementById('today-tasks-timeline'); 
+            const emptyMsg = document.getElementById('empty-timeline-msg');
+            container.innerHTML = ''; 
+            const tasks = D.taskData[getTodayStr()] || [];
+            
+            if (tasks.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                tasks.forEach(t => { 
+                    container.innerHTML += `
+                    <div class="relative">
+                        <div class="absolute -left-[21px] sm:-left-[29px] top-1 w-3 h-3 bg-secondary rounded-full border-2 border-white shadow-sm"></div>
+                        <div class="bg-gray-50 hover:bg-white p-3 rounded-xl border border-gray-100 shadow-sm transition-colors text-sm mb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <strong class="font-black text-textmain">${t.name}</strong>
+                                <span class="text-xs font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded">${t.duration}m</span>
+                            </div>
+                            <div class="text-xs text-gray-500 font-medium"><i class="fa fa-clock-o mr-1"></i>${t.startTime} - ${t.endTime}</div>
+                        </div>
+                    </div>`; 
+                }); 
+            }
+        }
+        // ================= Todo 核心强化结束 =================
+
+
         function initSync() {
             document.getElementById('btn-export').onclick = () => { const b=new Blob([JSON.stringify(D)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`sync_${getTodayStr()}.json`; a.click(); alert('请覆盖坚果云文件'); };
             document.getElementById('import-file-input').onchange = e => { const r=new FileReader(); r.onload=ev=>{ D=JSON.parse(ev.target.result); saveData(); alert('导入成功'); location.reload(); }; r.readAsText(e.target.files[0]); };
         }
-        function initTasks() {
-            document.getElementById('btn-add-todo').onclick = () => { const n=document.getElementById('new-todo-input').value.trim(); if(n){ D.todoData[getTodayStr()].push({id:'td_'+Date.now(), name:n, done:false}); document.getElementById('new-todo-input').value=''; saveData(); renderTodos(); }};
-            document.getElementById('end-task').onclick = () => { if(currentTask){ clearInterval(taskTimer); D.taskData[getTodayStr()].push({id:'t_'+Date.now(), name:currentTask.name, startTime:currentTask.startTime, endTime:getTimeStr(), duration:Math.floor((Date.now()-currentTask.startTimestamp)/60000)}); currentTask=null; document.getElementById('current-task-container').classList.add('hidden'); saveData(); renderTodayTasksTimeline(); }};
-        }
-        function renderTodos() { const c=document.getElementById('todo-list-container'); c.innerHTML=''; (D.todoData[getTodayStr()]||[]).forEach(t=>{ c.innerHTML+=`<div class="flex justify-between p-2 bg-white rounded border text-sm"><span class="${t.done?'line-through text-gray-400':''}">${t.name}</span><button onclick="startTask('${t.name}')" class="text-secondary"><i class="fa fa-play"></i></button></div>`; }); }
-        window.startTask = n => { currentTask={name:n, startTime:getTimeStr(), startTimestamp:Date.now()}; document.getElementById('current-task-name').textContent=n; document.getElementById('current-task-container').classList.remove('hidden'); taskTimer=setInterval(()=>{const e=Date.now()-currentTask.startTimestamp; document.getElementById('current-task-time').textContent=`${String(Math.floor(e/3600000)).padStart(2,'0')}:${String(Math.floor((e%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((e%60000)/1000)).padStart(2,'0')}`}, 1000); };
-        function renderTodayTasksTimeline() { const c=document.getElementById('today-tasks-timeline'); c.innerHTML=''; (D.taskData[getTodayStr()]||[]).forEach(t=>{ c.innerHTML+=`<div class="bg-gray-50 p-2 rounded text-sm mb-2"><b>${t.name}</b> <span class="text-xs text-gray-500">${t.startTime}-${t.endTime} (${t.duration}m)</span></div>` }); }
         function initPhone() {
             const h = s => { const r=document.getElementById('phone-reason-input').value; if(r){ const t=getTodayStr(); if(s){ D.phoneResistData.totalCount++; D.phoneResistData.records[t].count++; } D.phoneResistData.records[t].history.unshift({time:getTimeStr(), reason:r, success:s}); saveData(); document.getElementById('phone-reason-input').value=''; renderPhoneHistory(); }};
             document.getElementById('btn-resist-success').onclick = () => h(true); document.getElementById('btn-resist-fail').onclick = () => h(false);
         }
         function renderPhoneHistory() {
             document.getElementById('phone-resist-count').textContent=D.phoneResistData.totalCount;
-            const c=document.getElementById('phone-history-list'); c.innerHTML=''; (D.phoneResistData.records[getTodayStr()].history||[]).forEach(i=>{ c.innerHTML+=`<tr><td class="px-4 py-2">${i.time}</td><td class="px-4 py-2">${i.reason}</td><td class="px-4 py-2 text-right">${i.success?'成功':'失败'}</td></tr>` });
+            const c=document.getElementById('phone-history-list'); c.innerHTML=''; (D.phoneResistData.records[getTodayStr()].history||[]).forEach(i=>{ c.innerHTML+=`<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${i.time}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${i.reason}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right">${i.success?'<span class="bg-success/20 text-green-700 px-2 py-1 rounded font-bold text-xs">成功</span>':'<span class="bg-danger/20 text-red-700 px-2 py-1 rounded font-bold text-xs">失败</span>'}</td></tr>` });
         }
         function checkAchievements() { document.getElementById('unlocked-count').textContent=D.unlockedAchievements.length; document.getElementById('total-achievements-count').textContent=ACHIEVEMENTS_DB.length; }
         function renderAchievements() {
