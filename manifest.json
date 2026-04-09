@@ -1,0 +1,17 @@
+{
+  "name": "PhD Workspace Flow",
+  "short_name": "PhD Flow",
+  "description": "科研工位起居与多端同步系统",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f5f6f8",
+  "theme_color": "#9fbcdb",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3062/3062331.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
