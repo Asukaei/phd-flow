@@ -77,9 +77,8 @@
                     <div class="mt-4 sm:mt-8 border-t border-gray-100 pt-4 sm:pt-6">
                         <h3 class="text-xs sm:text-sm font-black text-gray-800 mb-3 sm:mb-4 flex items-center tracking-widest uppercase"><i class="fa fa-dashboard text-primary mr-2"></i>今日状态</h3>
                         <div class="space-y-2 sm:space-y-3 text-xs sm:text-sm font-bold">
-                            <!-- <div class="flex justify-between items-center"><span class="text-gray-400">上午打卡</span><span id="sb-m-in" class="text-gray-300">未打卡</span></div>
-                            <div class="flex justify-between items-center"><span class="text-gray-400">下午打卡</span><span id="sb-a-in" class="text-gray-300">未打卡</span></div>
-                            <div class="flex justify-between items-center"><span class="text-gray-400">晚上打卡</span><span id="sb-e-in" class="text-gray-300">未打卡</span></div> -->
+                            <div class="flex justify-between items-center"><span class="text-gray-400">上班打卡</span><span id="sb-work-in" class="text-gray-300">未打卡</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-400">下班打卡</span><span id="sb-work-out" class="text-gray-300">未打卡</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">手机克制</span><span id="sb-phone" class="text-danger">0 次</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">进行中任务</span><span id="sb-task" class="text-gray-300 truncate max-w-[80px] sm:max-w-[100px] text-right" title="">无</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">每日习惯</span><span id="sb-habit" class="text-gray-300">0%</span></div>
@@ -110,50 +109,37 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                         <div class="bg-primary/10 border border-primary/20 rounded-2xl p-4 sm:p-6 flex md:block items-center justify-between gap-2">
-                            <h3 class="text-base sm:text-lg font-bold text-primary sm:mb-4 text-left sm:text-center w-16 sm:w-auto">上午</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-primary sm:mb-3 text-left sm:text-center w-16 sm:w-auto">上班</h3>
                             <div class="flex-1 flex md:block gap-2 space-y-0 md:space-y-3">
-                                <button id="morning-checkin" class="flex-1 w-full bg-primary text-white py-2 sm:py-3 rounded-xl font-bold btn-shadow text-sm sm:text-base">上班</button>
-                                <button id="morning-checkout" class="flex-1 w-full bg-white text-primary border border-primary/30 py-2 sm:py-2.5 rounded-xl font-bold text-sm sm:text-base" disabled>下班</button>
+                                <button id="work-checkin" class="flex-1 w-full bg-primary text-white py-2 sm:py-3 rounded-xl font-bold btn-shadow text-sm sm:text-base">上班打卡</button>
                             </div>
-                        </div>
-                        <div class="bg-secondary/10 border border-secondary/20 rounded-2xl p-4 sm:p-6 flex md:block items-center justify-between gap-2">
-                            <h3 class="text-base sm:text-lg font-bold text-secondary sm:mb-4 text-left sm:text-center w-16 sm:w-auto">下午</h3>
-                            <div class="flex-1 flex md:block gap-2 space-y-0 md:space-y-3">
-                                <button id="afternoon-checkin" class="flex-1 w-full bg-secondary text-white py-2 sm:py-3 rounded-xl font-bold btn-shadow text-sm sm:text-base">上班</button>
-                                <button id="afternoon-checkout" class="flex-1 w-full bg-white text-secondary border border-secondary/30 py-2 sm:py-2.5 rounded-xl font-bold text-sm sm:text-base" disabled>下班</button>
-                            </div>
+                            <p class="text-xs text-textmuted mt-2 sm:mt-3 text-right md:text-center">达标时间：09:00-09:30</p>
                         </div>
                         <div class="bg-accent/10 border border-accent/20 rounded-2xl p-4 sm:p-6 flex md:block items-center justify-between gap-2">
-                            <h3 class="text-base sm:text-lg font-bold text-accent sm:mb-4 text-left sm:text-center w-16 sm:w-auto">晚上</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-accent sm:mb-3 text-left sm:text-center w-16 sm:w-auto">下班</h3>
                             <div class="flex-1 flex md:block gap-2 space-y-0 md:space-y-3">
-                                <button id="evening-checkin" class="flex-1 w-full bg-accent text-white py-2 sm:py-3 rounded-xl font-bold btn-shadow text-sm sm:text-base">上班</button>
-                                <button id="evening-checkout" class="flex-1 w-full bg-white text-accent border border-accent/30 py-2 sm:py-2.5 rounded-xl font-bold text-sm sm:text-base" disabled>下班</button>
+                                <button id="work-checkout" class="flex-1 w-full bg-accent text-white py-2 sm:py-3 rounded-xl font-bold btn-shadow text-sm sm:text-base" disabled>下班打卡</button>
                             </div>
+                            <p class="text-xs text-textmuted mt-2 sm:mt-3 text-right md:text-center">达标时间：20:00 及以后</p>
                         </div>
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm mb-10">
                         <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-                            <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa fa-list-alt mr-2 text-primary"></i>打卡明细</h3>
+                            <h3 class="font-bold text-gray-800 text-sm sm:text-base"><i class="fa fa-list-alt mr-2 text-primary"></i>今日考勤记录</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-[500px] sm:min-w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 bg-gray-50 uppercase font-bold">
                                     <tr>
-                                        <th class="px-4 sm:px-6 py-3">时段</th><th class="px-4 sm:px-6 py-3">规定上班</th><th class="px-4 sm:px-6 py-3">规定下班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th>
+                                        <th class="px-4 sm:px-6 py-3">记录</th><th class="px-4 sm:px-6 py-3">规定上班</th><th class="px-4 sm:px-6 py-3">规定下班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="today-checkin-table">
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">上午</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">06:00-12:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-14:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-m-out">-</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">下午</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">12:00-17:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">14:00-20:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-a-out">-</td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">晚上</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">17:00-22:00</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00-24:00</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-e-out">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">工位考勤</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-09:30</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00 及以后</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-out">-</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -661,8 +647,54 @@
             }, 1200);
         }
 
+        function parseTimeToMinutes(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string' || !timeStr.includes(':')) return null;
+            const [h, m] = timeStr.split(':').map(Number);
+            if (Number.isNaN(h) || Number.isNaN(m)) return null;
+            return h * 60 + m;
+        }
+
+        function isWorkCheckInOk(timeStr) {
+            const minutes = parseTimeToMinutes(timeStr);
+            return minutes !== null && minutes >= 9 * 60 && minutes <= 9 * 60 + 30;
+        }
+
+        function isWorkCheckOutOk(timeStr) {
+            const minutes = parseTimeToMinutes(timeStr);
+            return minutes !== null && minutes >= 20 * 60;
+        }
+
+        function normalizeCheckinRecord(record) {
+            if (!record) {
+                return { work: { checkIn: null, checkOut: null, status: { checkIn: false, checkOut: false } } };
+            }
+            if (record.work) {
+                record.work.status = {
+                    checkIn: !!record.work.status?.checkIn || isWorkCheckInOk(record.work.checkIn),
+                    checkOut: !!record.work.status?.checkOut || isWorkCheckOutOk(record.work.checkOut)
+                };
+                return record;
+            }
+
+            const legacyPeriods = ['morning', 'afternoon', 'evening']
+                .map(key => record[key])
+                .filter(Boolean);
+            const checkIns = legacyPeriods.map(item => item.checkIn).filter(Boolean).sort();
+            const checkOuts = legacyPeriods.map(item => item.checkOut).filter(Boolean).sort();
+            return {
+                work: {
+                    checkIn: checkIns[0] || null,
+                    checkOut: checkOuts.length ? checkOuts[checkOuts.length - 1] : null,
+                    status: {
+                        checkIn: isWorkCheckInOk(checkIns[0] || null),
+                        checkOut: isWorkCheckOutOk(checkOuts.length ? checkOuts[checkOuts.length - 1] : null)
+                    }
+                }
+            };
+        }
+
         function ensureDateDataExists(dateStr) {
-            if (!D.checkinData[dateStr]) D.checkinData[dateStr] = { morning: {checkIn:null, checkOut:null, status:{}}, afternoon: {checkIn:null, checkOut:null, status:{}}, evening: {checkIn:null, checkOut:null, status:{}} };
+            D.checkinData[dateStr] = normalizeCheckinRecord(D.checkinData[dateStr]);
             if (!D.phoneResistData.records[dateStr]) D.phoneResistData.records[dateStr] = { count: 0, history: [] };
             if (!D.taskData[dateStr]) D.taskData[dateStr] = [];
             if (!D.timeBlocks[dateStr]) D.timeBlocks[dateStr] = [];
@@ -674,16 +706,13 @@
 
         function updateSidebar() {
             const t = getTodayStr(); ensureDateDataExists(t);
-            const cd = D.checkinData[t];
-            const ids = ['m-in', 'a-in', 'e-in'];
-            const periods = ['morning', 'afternoon', 'evening'];
-            const colors = ['primary', 'secondary', 'accent'];
-            
-            periods.forEach((p, i) => {
-                const el = document.getElementById(`sb-${ids[i]}`);
-                el.textContent = cd[p].checkIn ? cd[p].checkIn : '未打卡';
-                el.className = cd[p].checkIn ? `text-${colors[i]}` : 'text-gray-300';
-            });
+            const work = D.checkinData[t].work;
+            const workInEl = document.getElementById('sb-work-in');
+            const workOutEl = document.getElementById('sb-work-out');
+            workInEl.textContent = work.checkIn || '未打卡';
+            workInEl.className = work.checkIn ? (work.status.checkIn ? 'text-success' : 'text-danger') : 'text-gray-300';
+            workOutEl.textContent = work.checkOut || '未打卡';
+            workOutEl.className = work.checkOut ? (work.status.checkOut ? 'text-success' : 'text-danger') : 'text-gray-300';
             document.getElementById('sb-phone').textContent = `${D.phoneResistData.records[t].count} 次`;
             
             const sbTask = document.getElementById('sb-task');
@@ -750,10 +779,20 @@
             const t = getTodayStr();
             document.getElementById('btn-wake').onclick = () => { D.sleepData[t].wake = getTimeStr(); D.sleepData[t].wakeOk = (new Date().getHours() < 9); saveData(); updateCheckinUI(); };
             document.getElementById('btn-sleep').onclick = () => { const now=new Date(), h=now.getHours(); const target = h>=0&&h<5?getTodayStr(-1):t; ensureDateDataExists(target); D.sleepData[target].sleep = getTimeStr(); D.sleepData[target].sleepOk = (h>=18&&(h<23||(h===23&&now.getMinutes()<=30))); saveData(); updateCheckinUI(); };
-            ['morning', 'afternoon', 'evening'].forEach(p => {
-                document.getElementById(`${p}-checkin`).onclick = () => { D.checkinData[t][p].checkIn = getTimeStr(); const h=new Date().getHours(); D.checkinData[t][p].status.checkIn=(p==='morning'&&h<8)||(p==='afternoon'&&h<14)||(p==='evening'&&h<19); saveData(); updateCheckinUI(); };
-                document.getElementById(`${p}-checkout`).onclick = () => { D.checkinData[t][p].checkOut = getTimeStr(); const h=new Date().getHours(); D.checkinData[t][p].status.checkOut=(p==='morning'&&h>=12)||(p==='afternoon'&&h>=18)||(p==='evening'&&h>=21); saveData(); updateCheckinUI(); };
-            });
+            document.getElementById('work-checkin').onclick = () => {
+                const timeStr = getTimeStr();
+                D.checkinData[t].work.checkIn = timeStr;
+                D.checkinData[t].work.status.checkIn = isWorkCheckInOk(timeStr);
+                saveData();
+                updateCheckinUI();
+            };
+            document.getElementById('work-checkout').onclick = () => {
+                const timeStr = getTimeStr();
+                D.checkinData[t].work.checkOut = timeStr;
+                D.checkinData[t].work.status.checkOut = isWorkCheckOutOk(timeStr);
+                saveData();
+                updateCheckinUI();
+            };
             document.getElementById('cal-prev').onclick = () => { currentCalDate.setMonth(currentCalDate.getMonth()-1); renderCheckinCalendar(); };
             document.getElementById('cal-next').onclick = () => { currentCalDate.setMonth(currentCalDate.getMonth()+1); renderCheckinCalendar(); };
             updateCheckinUI();
@@ -762,16 +801,18 @@
         function updateCheckinUI() {
             const t = getTodayStr(); ensureDateDataExists(t);
             const sd = D.sleepData[t];
+            const wd = D.checkinData[t].work;
             const wb = document.getElementById('btn-wake'), sb = document.getElementById('btn-sleep');
             if(sd.wake){ document.getElementById('wake-time-display').textContent=`已打卡: ${sd.wake}`; wb.disabled=true; wb.classList.add('opacity-50'); } else { document.getElementById('wake-time-display').textContent=`-`; wb.disabled=false; wb.classList.remove('opacity-50'); }
             if(sd.sleep){ document.getElementById('sleep-time-display').textContent=`已打卡: ${sd.sleep}`; sb.disabled=true; sb.classList.add('opacity-50'); } else { document.getElementById('sleep-time-display').textContent=`-`; sb.disabled=false; sb.classList.remove('opacity-50'); }
-            ['morning', 'afternoon', 'evening'].forEach(p => {
-                const d = D.checkinData[t][p];
-                const inB = document.getElementById(`${p}-checkin`), outB = document.getElementById(`${p}-checkout`);
-                inB.disabled = d.checkIn !== null; if(d.checkIn !== null) inB.classList.add('opacity-50'); else inB.classList.remove('opacity-50');
-                outB.disabled = d.checkOut !== null || d.checkIn === null; if(d.checkOut !== null || d.checkIn === null) outB.classList.add('opacity-50'); else outB.classList.remove('opacity-50');
-                const sp = p.charAt(0); document.getElementById(`td-${sp}-in`).textContent=d.checkIn||'-'; document.getElementById(`td-${sp}-out`).textContent=d.checkOut||'-';
-            });
+            const inB = document.getElementById('work-checkin');
+            const outB = document.getElementById('work-checkout');
+            inB.disabled = wd.checkIn !== null;
+            outB.disabled = wd.checkOut !== null || wd.checkIn === null;
+            inB.classList.toggle('opacity-50', inB.disabled);
+            outB.classList.toggle('opacity-50', outB.disabled);
+            document.getElementById('td-work-in').textContent = wd.checkIn || '-';
+            document.getElementById('td-work-out').textContent = wd.checkOut || '-';
             renderCheckinCalendar();
         }
 
@@ -783,12 +824,12 @@
             for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
             for(let i=1; i<=daysInM; i++) {
                 const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const sd = D.sleepData[dStr] || {}, cd = D.checkinData[dStr];
-                let c = 0; if(cd){ if(cd.morning.checkIn)c++; if(cd.afternoon.checkIn)c++; if(cd.evening.checkIn)c++; }
+                const sd = D.sleepData[dStr] || {}, cd = normalizeCheckinRecord(D.checkinData[dStr]);
                 let dots = '';
                 if(sd.wakeOk) dots += '<span class="w-1.5 h-1.5 bg-warning rounded-full"></span>';
                 if(sd.sleepOk) dots += '<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>';
-                if(c>=2) dots += '<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>';
+                if(cd?.work?.status?.checkIn && cd?.work?.status?.checkOut) dots += '<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>';
+                else if(cd?.work?.checkIn || cd?.work?.checkOut) dots += '<span class="w-1.5 h-1.5 bg-danger rounded-full"></span>';
                 grid.innerHTML += `<div class="py-1 flex flex-col items-center justify-center rounded-lg ${dStr===getTodayStr()?'bg-blue-50':''}"><span class="text-xs font-bold mb-0.5">${i}</span><div class="flex gap-0.5 h-1.5">${dots}</div></div>`;
             }
         }
@@ -1136,9 +1177,12 @@
             for(let i=days-1; i>=0; i--) {
                 const d = getTodayStr(-i); labels.push(d.slice(5)); 
                 
-                // const cDay = D.checkinData[d]; let tot=0, qual=0;
-                // if(cDay) { ['morning','afternoon','evening'].forEach(p => { if(cDay[p].checkIn) { tot++; if(cDay[p].status.checkIn) qual++; } if(cDay[p].checkOut) { tot++; if(cDay[p].status.checkOut) qual++; } }); }
-                // rateData.push(tot > 0 ? Math.round((qual/tot)*100) : 0);
+                const cDay = normalizeCheckinRecord(D.checkinData[d]); let tot=0, qual=0;
+                if(cDay?.work) {
+                    if(cDay.work.checkIn) { tot++; if(cDay.work.status.checkIn) qual++; }
+                    if(cDay.work.checkOut) { tot++; if(cDay.work.status.checkOut) qual++; }
+                }
+                rateData.push(tot > 0 ? Math.round((qual/tot)*100) : 0);
 
                 const sDay = D.sleepData[d];
                 if(sDay) { if(sDay.wake) { if(sDay.wakeOk) wakeOk++; else wakeFail++; } if(sDay.sleep) { if(sDay.sleepOk) sleepOk++; else sleepFail++; } }
