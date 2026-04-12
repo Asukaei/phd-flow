@@ -1014,7 +1014,7 @@
             const items = [];
             const bonusInfo = getBonusInfo(dateStr);
             if (bonusInfo.holidayBonus > 0) {
-                items.push({ time: '鍏ㄥぉ', amount: bonusInfo.holidayBonus, reason: `${bonusInfo.holiday.label}涓婄彮鍔犲垎`, source: 'holiday' });
+                items.push({ time: '全天', amount: bonusInfo.holidayBonus, reason: `${bonusInfo.holiday.label}上班加分`, source: 'holiday' });
             }
             (D.bonusData.records[dateStr] || []).forEach(item => items.push(item));
             return items;
