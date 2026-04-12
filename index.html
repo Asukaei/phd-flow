@@ -1122,6 +1122,7 @@
                 addPenaltyRecord({ points: 1, reason: `手机端专注 ${elapsedMin} 分钟确认离开：${reason}`, source: 'focus-guard' });
             } else if (!focusGuard.bonusGranted) {
                 focusGuard.bonusGranted = true;
+                currentTask.bonusGranted = true;
                 addBonusRecord({ amount: 1, reason: `手机端专注满 ${elapsedMin} 分钟后确认离开`, source: 'focus-guard' });
             }
         }
@@ -1218,12 +1219,17 @@
             clearInterval(taskTimer);
             const t = getTodayStr();
             ensureDateDataExists(t);
+            const duration = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
+            if (duration >= 45 && !currentTask.bonusGranted) {
+                currentTask.bonusGranted = true;
+                addBonusRecord({ dateStr: t, amount: 1, reason: `${currentTask.name} 专注满 ${duration} 分钟`, source: 'focus-complete' });
+            }
             D.taskData[t].push({
                 id: 't_' + Date.now(),
                 name: currentTask.name,
                 startTime: currentTask.startTime,
                 endTime: getTimeStr(),
-                duration: Math.floor((Date.now() - currentTask.startTimestamp) / 60000)
+                duration
             });
             currentTask = null;
             hideFocusReminder();
@@ -1780,6 +1786,7 @@
             }
 
             todayTodos.forEach(t => { 
+                const mobileOnly = !isProbablyMobileDevice();
                 container.innerHTML += `
                 <div class="flex items-center justify-between p-2.5 sm:p-3 bg-white rounded-xl border border-gray-100 shadow-sm mb-2 group transition-all hover:border-secondary/30">
                     <label class="flex items-center cursor-pointer flex-1 truncate mr-2">
@@ -1787,7 +1794,7 @@
                         <span class="font-bold text-sm text-textmain peer-checked:line-through peer-checked:text-gray-400 truncate transition-all" title="${t.name}">${t.name}</span>
                     </label>
                     <div class="flex items-center gap-1">
-                        <button onclick="startTask('${t.name}')" class="text-secondary hover:bg-secondary hover:text-white w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="开始心流专注">
+                        <button onclick="startTask('${t.name}')" class="${mobileOnly ? 'text-gray-300 bg-gray-50 cursor-not-allowed' : 'text-secondary hover:bg-secondary hover:text-white'} w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="${mobileOnly ? '仅手机端可开启专注' : '开始心流专注'}" ${mobileOnly ? 'disabled' : ''}>
                             <i class="fa fa-play text-xs sm:text-sm"></i>
                         </button>
                         <button onclick="deleteTodo('${t.id}')" class="text-gray-300 hover:text-danger hover:bg-danger/10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="删除任务">
@@ -1811,7 +1818,11 @@
         };
 
         window.startTask = async n => { 
-            currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now(), breakReminderCount: 0}; 
+            if (!isProbablyMobileDevice()) {
+                alert('仅手机端可开启专注模式。');
+                return;
+            }
+            currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now(), breakReminderCount: 0, bonusGranted: false}; 
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
             document.getElementById('current-real-time').textContent = getTimeStr();
