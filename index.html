@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -37,7 +37,7 @@
         ::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #bbaecc; }
 
-        /* iOS 特供补丁 */
+        /* iOS 适配补丁 */
         @supports (padding-top: env(safe-area-inset-top)) {
             body {
                 padding-top: max(1rem, env(safe-area-inset-top));
@@ -46,7 +46,7 @@
                 padding-right: env(safe-area-inset-right);
             }
         }
-        /* 强制所有输入框字体大于 16px，彻底杜绝 iOS 自动放大页面破坏布局 */
+        /* 强制输入框字体不小于 16px，避免 iOS 自动放大导致布局抖动 */
         input, select, textarea { font-size: 16px !important; }
         * { -webkit-tap-highlight-color: transparent; }
         .focus-reminder-backdrop { backdrop-filter: blur(14px); background: rgba(34, 44, 67, 0.48); }
@@ -93,7 +93,7 @@
                             <div id="focus-reminder-elapsed" class="text-3xl sm:text-4xl font-black text-secondary leading-none">45 分钟</div>
                         </div>
                         <div class="text-right text-xs sm:text-sm font-bold text-textmuted">
-                            <div>建议站起 2-5 分钟</div>
+                            <div>建议起身 2-5 分钟</div>
                             <div>拉伸腰背，看看远处</div>
                         </div>
                     </div>
@@ -120,7 +120,7 @@
                         </div>
                         <div>
                             <p class="text-[11px] font-black uppercase tracking-[0.28em] text-danger/70">Leave Focus</p>
-                            <h3 class="text-xl sm:text-[1.75rem] font-black text-textmain leading-tight">你确定要离开这次专注吗</h3>
+                            <h3 class="text-xl sm:text-[1.75rem] font-black text-textmain leading-tight">你确认要离开这次专注吗？</h3>
                             <p class="text-sm text-textmuted font-bold mt-1">如果只是手机自动息屏后又亮屏，不应该被误判。</p>
                         </div>
                     </div>
@@ -168,9 +168,9 @@
             <nav class="md:col-span-3">
                 <div class="soft-card p-4 sm:p-5 md:sticky md:top-8">
                     <ul class="grid grid-cols-2 gap-2 md:grid-cols-1 md:block md:space-y-3">
-                        <li><button id="nav-checkin" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl bg-primary text-white font-bold flex items-center justify-between shadow-md text-sm md:text-base"><span class="tracking-wide">工位起居</span><i class="fa fa-clock-o text-lg"></i></button></li>
+                        <li><button id="nav-checkin" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl bg-primary text-white font-bold flex items-center justify-between shadow-md text-sm md:text-base"><span class="tracking-wide">起居打卡</span><i class="fa fa-clock-o text-lg"></i></button></li>
                         <li><button id="nav-hourly" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">时间日历</span><i class="fa fa-calendar text-lg text-primary"></i></button></li>
-                        <li><button id="nav-tasks" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">Todo专注</span><i class="fa fa-tasks text-lg text-secondary"></i></button></li>
+                        <li><button id="nav-tasks" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">Todo与专注</span><i class="fa fa-tasks text-lg text-secondary"></i></button></li>
                         <li><button id="nav-habits" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">每日习惯</span><i class="fa fa-check-square-o text-lg text-success"></i></button></li>
                         <li><button id="nav-journal" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">每日复盘</span><i class="fa fa-book text-lg text-accent"></i></button></li>
                         <li><button id="nav-phone" class="w-full text-left px-3 py-2.5 md:px-5 md:py-3.5 rounded-xl hover:bg-gray-50 text-textmain font-bold flex items-center justify-between transition-all text-sm md:text-base"><span class="tracking-wide">克制诱惑</span><i class="fa fa-mobile text-lg text-danger"></i></button></li>
@@ -288,7 +288,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">访问令牌</label>
-                                <input id="sync-access-token" type="password" placeholder="输入你后端设置的访问令牌" class="w-full px-4 py-3 rounded-xl border border-blue-200 bg-white text-sm font-medium outline-none focus:ring-2 focus:ring-blue-300">
+                                <input id="sync-access-token" type="password" placeholder="输入你的访问令牌" class="w-full px-4 py-3 rounded-xl border border-blue-200 bg-white text-sm font-medium outline-none focus:ring-2 focus:ring-blue-300">
                             </div>
                         </div>
                         <div class="flex items-center gap-3 mt-4">
@@ -308,14 +308,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                         <div class="bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 text-center">
                             <h3 class="text-base sm:text-lg font-bold text-gray-700 mb-2">本地备份导出</h3>
-                            <p class="text-xs text-gray-500 mb-4 sm:mb-6">紧急情况下，仍可导出完整 JSON 备份</p>
+                            <p class="text-xs text-gray-500 mb-4 sm:mb-6">需要留档时，可以导出完整 JSON 备份。</p>
                             <button id="btn-export" class="w-full bg-gray-800 text-white font-bold py-3 sm:py-4 rounded-xl shadow-md active:scale-95 transition-all text-sm sm:text-base">
                                 <i class="fa fa-download mr-2"></i> 导出备份文件
                             </button>
                         </div>
                         <div class="bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 text-center">
                             <h3 class="text-base sm:text-lg font-bold text-gray-700 mb-2">本地备份恢复</h3>
-                            <p class="text-xs text-gray-500 mb-4 sm:mb-6">从本地 JSON 文件恢复数据并覆盖当前内容</p>
+                            <p class="text-xs text-gray-500 mb-4 sm:mb-6">从本地 JSON 文件恢复数据，并覆盖当前内容。</p>
                             <label class="w-full bg-white text-gray-800 border border-gray-300 font-bold py-3 sm:py-4 rounded-xl shadow-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer text-sm sm:text-base">
                                 <i class="fa fa-upload mr-2"></i> 导入备份文件
                                 <input type="file" id="import-file-input" class="hidden" accept=".json,application/json">
@@ -337,11 +337,11 @@
                             <div class="col-span-1 md:col-span-2"><input type="time" id="tb-end" class="w-full p-2 border border-gray-200 rounded-lg text-sm font-bold"></div>
                             <div class="col-span-2 md:col-span-3">
                                 <select id="tb-cat" class="w-full p-2 border border-gray-200 rounded-lg font-bold text-sm">
-                                    <option value="study" class="text-primary">📖 学习</option><option value="work" class="text-secondary">🧪 科研</option><option value="play" class="text-accent">🎮 娱乐</option>
-                                    <option value="meal" class="text-warning">🍱 餐饮</option><option value="rest" class="text-success">💤 休息</option><option value="waste" class="text-danger">📱 摸鱼</option>
+                                    <option value="study" class="text-primary">学习</option><option value="work" class="text-secondary">科研</option><option value="play" class="text-accent">娱乐</option>
+                                    <option value="meal" class="text-warning">餐饮</option><option value="rest" class="text-success">休息</option><option value="waste" class="text-danger">摸鱼</option>
                                 </select>
                             </div>
-                            <div class="col-span-2 md:col-span-3"><input type="text" id="tb-desc" placeholder="具体做了什么？" class="w-full p-2 border border-gray-200 rounded-lg text-sm"></div>
+                            <div class="col-span-2 md:col-span-3"><input type="text" id="tb-desc" placeholder="具体在做什么？" class="w-full p-2 border border-gray-200 rounded-lg text-sm"></div>
                             <div class="col-span-2"><button id="btn-add-block" class="w-full bg-primary text-white font-bold py-2 rounded-lg btn-shadow text-sm">添加</button></div>
                         </div>
                     </div>
@@ -374,7 +374,7 @@
                                 <div class="flex flex-col items-center text-center">
                                     <span class="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2 sm:mb-3">● 正在专注心流</span>
                                     <div id="mobile-focus-badge" class="hidden text-[11px] sm:text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full mb-2">手机端约束模式已开启</div>
-                                    <div id="mobile-focus-tip" class="hidden text-xs text-gray-500 font-bold mb-3">切后台或退出全屏会自动记惩罚点</div>
+                                    <div id="mobile-focus-tip" class="hidden text-xs text-gray-500 font-bold mb-3">切到后台或退出全屏后，会触发离开确认</div>
                                     <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
                                     <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 font-mono tracking-wider" id="current-task-time">00:00:00</div>
                                     <div class="mt-3 mb-4 sm:mb-5 flex flex-col items-center">
@@ -389,7 +389,7 @@
                             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm min-h-[250px]">
                                 <h3 class="text-base sm:text-lg font-black text-textmain mb-4 sm:mb-6 border-b border-gray-50 pb-3 sm:pb-4"><i class="fa fa-clock-o text-secondary mr-2"></i>今日专注时间线</h3>
                                 <div id="today-tasks-timeline" class="relative border-l-2 border-secondary/20 ml-2 sm:ml-4 pl-4 sm:pl-6 space-y-4 sm:space-y-6"></div>
-                                <div id="empty-timeline-msg" class="text-center text-textmuted font-bold py-10 hidden text-sm">今日还未开启专注，快去左侧点播放键吧！</div>
+                                <div id="empty-timeline-msg" class="text-center text-textmuted font-bold py-10 hidden text-sm">今天还未开启专注，去左侧点播放键开始吧</div>
                             </div>
                         </div>
                     </div>
@@ -425,11 +425,11 @@
                     <div class="bg-accent/10 rounded-2xl p-4 sm:p-6 mb-6 border border-accent/20 space-y-4 sm:space-y-6">
                         <div>
                             <h3 class="text-base sm:text-lg font-bold text-accent mb-2 flex items-center"><i class="fa fa-star mr-2"></i>今日成就</h3>
-                            <textarea id="journal-proud" class="w-full px-4 py-3 rounded-xl shadow-sm border border-white text-sm outline-none focus:ring-2 focus:ring-accent" rows="4" placeholder="今天最为自己骄傲的一件事/解决的难题是..."></textarea>
+                            <textarea id="journal-proud" class="w-full px-4 py-3 rounded-xl shadow-sm border border-white text-sm outline-none focus:ring-2 focus:ring-accent" rows="4" placeholder="今天最值得肯定的一件事，或最有成就感的突破是..."></textarea>
                         </div>
                         <div>
                             <h3 class="text-base sm:text-lg font-bold text-accent mb-2 flex items-center"><i class="fa fa-arrow-up mr-2"></i>明日改进</h3>
-                            <textarea id="journal-change" class="w-full px-4 py-3 rounded-xl shadow-sm border border-white text-sm outline-none focus:ring-2 focus:ring-accent" rows="4" placeholder="明天可以优化、改进的一个小改变是..."></textarea>
+                            <textarea id="journal-change" class="w-full px-4 py-3 rounded-xl shadow-sm border border-white text-sm outline-none focus:ring-2 focus:ring-accent" rows="4" placeholder="明天可以微调、优化、改进的一个小动作是..."></textarea>
                         </div>
                     </div>
                 </section>
@@ -443,12 +443,12 @@
                             <div class="text-4xl sm:text-5xl font-black text-danger drop-shadow-sm" id="phone-resist-count">0</div>
                         </div>
                         <div class="flex-1 w-full space-y-2 sm:space-y-3">
-                            <input type="text" id="phone-reason-input" placeholder="输入走神理由..." class="w-full px-4 py-2.5 sm:py-3.5 bg-white border border-danger/30 rounded-xl text-sm shadow-sm">
+                            <input type="text" id="phone-reason-input" placeholder="输入这次诱惑内容或原因..." class="w-full px-4 py-2.5 sm:py-3.5 bg-white border border-danger/30 rounded-xl text-sm shadow-sm">
                             <div class="flex gap-2 sm:gap-4">
-                                <button id="btn-resist-success" class="flex-1 bg-success text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-check mr-1 sm:mr-2"></i>成功</button>
+                                <button id="btn-resist-success" class="flex-1 bg-success text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-check mr-1 sm:mr-2"></i>忍住了</button>
                                 <button id="btn-resist-fail" class="flex-1 bg-danger text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-times mr-1 sm:mr-2"></i>没忍住</button>
                             </div>
-                            <p class="text-xs text-danger/80 font-bold">规则：每次“没忍住”自动记 1 个惩罚点；迟到/早退/晚起/晚睡等会按打卡信息自动计分。</p>
+                            <p class="text-xs text-danger/80 font-bold">规则：每次“没忍住”自动记 1 个惩罚点；迟到、早退、晚起、晚睡等会按打卡信息自动计分。</p>
                         </div>
                     </div>
 
@@ -476,7 +476,7 @@
                                 <div class="text-2xl font-black text-danger" id="penalty-month-total">0</div>
                             </div>
                             <div class="bg-white rounded-xl border border-amber-100 p-4">
-                                <div class="text-xs text-gray-500 font-bold mb-1">本月 Bonus</div>
+                                    <div class="text-xs text-gray-500 font-bold mb-1">本月 Bonus</div>
                                 <div class="text-2xl font-black text-warning" id="bonus-month-total">0</div>
                             </div>
                             <div class="bg-white rounded-xl border border-amber-100 p-4">
@@ -529,10 +529,10 @@
                         <span class="bg-warning/20 text-warning px-3 py-1 sm:px-4 sm:py-1.5 rounded-full font-bold text-xs sm:text-sm">已解锁 <span id="unlocked-count">0</span> / <span id="total-achievements-count">0</span></span>
                     </div>
                     <div class="space-y-6 sm:space-y-8">
-                        <div><h3 class="text-base sm:text-lg font-bold text-secondary mb-3 border-l-4 border-secondary pl-3">⏳ 专注与心流</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-focus"></div></div>
-                        <div><h3 class="text-base sm:text-lg font-bold text-primary mb-3 border-l-4 border-primary pl-3">🌅 作息与考勤</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-routine"></div></div>
-                        <div><h3 class="text-base sm:text-lg font-bold text-danger mb-3 border-l-4 border-danger pl-3">🛡️ 控制与抵抗</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-resist"></div></div>
-                        <div><h3 class="text-base sm:text-lg font-bold text-success mb-3 border-l-4 border-success pl-3">📖 沉淀与复盘</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-habit"></div></div>
+                        <div><h3 class="text-base sm:text-lg font-bold text-secondary mb-3 border-l-4 border-secondary pl-3">专注与心流</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-focus"></div></div>
+                        <div><h3 class="text-base sm:text-lg font-bold text-primary mb-3 border-l-4 border-primary pl-3">作息与考勤</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-routine"></div></div>
+                        <div><h3 class="text-base sm:text-lg font-bold text-danger mb-3 border-l-4 border-danger pl-3">控制与抵抗</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-resist"></div></div>
+                        <div><h3 class="text-base sm:text-lg font-bold text-success mb-3 border-l-4 border-success pl-3">沉淀与复盘</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5" id="ach-grid-habit"></div></div>
                     </div>
                 </section>
 
@@ -546,7 +546,7 @@
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                         <!-- <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
-                            <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">打卡合格率 (%)</h3>
+                            <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">鎵撳崱鍚堟牸鐜?(%)</h3>
                             <div class="relative w-full h-[180px] sm:h-[220px]"><canvas id="chart-checkin-rate"></canvas></div>
                         </div> -->
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
@@ -554,7 +554,7 @@
                             <div class="relative w-full h-[180px] sm:h-[220px]"><canvas id="chart-sleep-stats"></canvas></div>
                         </div>
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
-                            <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">本月奖惩结算</h3>
+                            <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">本月惩罚结算</h3>
                             <div class="grid grid-cols-2 gap-3">
                                 <div class="rounded-xl bg-danger/5 border border-danger/10 p-3">
                                     <div class="text-xs text-gray-500 font-bold mb-1">惩罚点</div>
@@ -569,11 +569,11 @@
                                     <div class="text-xl font-black text-textmain" id="stats-penalty-net">0</div>
                                 </div>
                                 <div class="rounded-xl bg-amber-50 border border-amber-200 p-3">
-                                    <div class="text-xs text-gray-500 font-bold mb-1">应储蓄</div>
+                                    <div class="text-xs text-gray-500 font-bold mb-1">应强制储蓄</div>
                                     <div class="text-xl font-black text-amber-600" id="stats-penalty-saving">0 元</div>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 font-bold mt-3">规则：1 Bonus = 抵消 2 个惩罚点；月末按净惩罚点结算。</p>
+                            <p class="text-xs text-gray-500 font-bold mt-3">规则：1 个 Bonus 可抵消 2 个惩罚点；月底按净惩罚点结算。</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -600,7 +600,7 @@
     </div>
 
     <script>
-        // ================= 数据初始化与工具函数 =================
+        // ================= 鏁版嵁鍒濆鍖栦笌宸ュ叿鍑芥暟 =================
         const getTodayStr = (offset=0) => { const d = new Date(); d.setDate(d.getDate() + offset); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         const getTimeStr = () => { const d = new Date(); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
         
@@ -616,7 +616,14 @@
 
         const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData', 'focusReliefData'];
         let D = {};
-        const CAT_MAP = { study: { label: '学习', color: 'primary' }, work: { label: '科研', color: 'secondary' }, play: { label: '娱乐', color: 'accent' }, meal: { label: '餐饮', color: 'warning' }, rest: { label: '休息', color: 'success' }, waste: { label: '摸鱼', color: 'danger' } };
+        const CAT_MAP = {
+            study: { label: '学习', color: 'primary' },
+            work: { label: '科研', color: 'secondary' },
+            play: { label: '娱乐', color: 'accent' },
+            meal: { label: '餐饮', color: 'warning' },
+            rest: { label: '休息', color: 'success' },
+            waste: { label: '摸鱼', color: 'danger' }
+        };
 
         const ACHIEVEMENTS_DB = [
             // ===== 专注与心流 =====
@@ -1007,7 +1014,7 @@
             const items = [];
             const bonusInfo = getBonusInfo(dateStr);
             if (bonusInfo.holidayBonus > 0) {
-                items.push({ time: '全天', amount: bonusInfo.holidayBonus, reason: `${bonusInfo.holiday.label}上班加分`, source: 'holiday' });
+                items.push({ time: '鍏ㄥぉ', amount: bonusInfo.holidayBonus, reason: `${bonusInfo.holiday.label}涓婄彮鍔犲垎`, source: 'holiday' });
             }
             (D.bonusData.records[dateStr] || []).forEach(item => items.push(item));
             return items;
@@ -1016,7 +1023,7 @@
         function getFocusReliefAdvice(record) {
             const count = Number(record?.count) || 0;
             if (count <= 2) return '';
-            return '今天“实在腰疼”已经用了 3 次以上。建议先把椅子靠背顶住腰，屏幕抬高到视线附近；每 30-45 分钟起身 2-5 分钟，做胸椎伸展、髋屈肌拉伸和轻微后仰；如果是持续刺痛或放射痛，就不要继续硬撑，尽快休息或就医。';
+            return '今天“实在腰疼”已经用了 3 次以上。建议先把椅背顶住腰部，屏幕抬高到视线附近；每 30-45 分钟起身 2-5 分钟，做胸椎伸展、髋屈肌拉伸和轻微后仰；如果是持续刺痛或放射痛，就不要继续硬扛，尽快休息或就医。';
         }
 
         function getPenaltySavingAmount(netPoints) {
@@ -1067,33 +1074,6 @@
             }
         }
 
-        function recordFocusGuardViolation(reason) {
-            const now = Date.now();
-            if (!focusGuard.active || now - focusGuard.violationCooldownAt < 10000) return;
-            focusGuard.violationCooldownAt = now;
-            const elapsedMin = currentTask ? Math.floor((Date.now() - currentTask.startTimestamp) / 60000) : 0;
-            if (elapsedMin < 15) {
-                alert(`你只坚持了 ${elapsedMin} 分钟就逃离了专注界面。15 分钟内离开会记录惩罚点。`);
-                addPenaltyRecord({ points: 2, reason: `手机端专注 ${elapsedMin} 分钟内逃离：${reason}`, source: 'focus-guard' });
-                saveData();
-                renderPenaltySummary();
-                return;
-            }
-            if (elapsedMin < 45) {
-                alert(`你已经坚持了 ${elapsedMin} 分钟。真的不要再坚持一会儿吗？满 45 分钟会获得 Bonus。`);
-                return;
-            }
-            if (!focusGuard.bonusGranted) {
-                focusGuard.bonusGranted = true;
-                addBonusRecord({ amount: 1, reason: `手机端专注满 ${elapsedMin} 分钟后离开界面`, source: 'focus-guard' });
-                saveData();
-                renderPenaltySummary();
-                alert(`你已经坚持了 ${elapsedMin} 分钟，做得不错。予以肯定，并奖励 1 Bonus。`);
-                return;
-            }
-            alert(`你已经坚持了 ${elapsedMin} 分钟，做得不错。继续保持。`);
-        }
-
         function hideFocusLeaveConfirm() {
             const modal = document.getElementById('focus-leave-modal');
             if (!modal) return;
@@ -1107,7 +1087,8 @@
             const modal = document.getElementById('focus-leave-modal');
             if (!modal) return;
             const elapsedMin = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
-            document.getElementById('focus-leave-message').textContent = `检测到专注过程被中断，原因：${focusLeaveState.reason}。如果只是手机息屏后又亮屏，请继续专注；如果你确认离开，本次专注会立刻结束，并按 ${elapsedMin < 15 ? '未满 15 分钟扣 2 点' : (elapsedMin < 45 ? '未满 45 分钟扣 1 点' : '已满足时长，按规则结算奖励')} 处理。`;
+            const outcome = elapsedMin < 15 ? '未满 15 分钟扣 2 点' : (elapsedMin < 45 ? '未满 45 分钟扣 1 点' : '已满足时长，按规则结算奖励');
+            document.getElementById('focus-leave-message').textContent = `检测到专注过程被中断，原因：${focusLeaveState.reason}。如果只是手机息屏后又亮屏，请继续专注；如果你确认离开，本次专注会立刻结束，并按 ${outcome} 处理。`;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             focusLeaveState.visible = true;
@@ -1180,7 +1161,7 @@
             if (!modal) return;
             document.getElementById('focus-reminder-title').textContent = '该起来活动一下了';
             document.getElementById('focus-reminder-elapsed').textContent = `${elapsedMin} 分钟`;
-            document.getElementById('focus-reminder-message').textContent = `你已经连续专注 ${elapsedMin} 分钟了。现在起身走两步、转转肩颈、活动一下腰背，再回来继续更稳。`;
+            document.getElementById('focus-reminder-message').textContent = `你已经连续专注 ${elapsedMin} 分钟了。现在起身走两步、转转肩颈、活动一下腰背，再回来继续会更稳。`;
             document.getElementById('focus-reminder-ok').textContent = '我去活动一下';
             document.getElementById('focus-reminder-continue').textContent = '继续专注';
             modal.classList.remove('hidden');
@@ -1365,7 +1346,7 @@
             const el = document.getElementById('sync-meta');
             if (!el) return;
             const meta = getSyncMeta();
-            el.textContent = `本地最近修改：${meta.localUpdatedAt || '-'} ｜ 最近同步：${meta.lastSyncedAt || '-'} ｜ 云端版本：${meta.lastRemoteUpdatedAt || '-'}`;
+            el.textContent = `本地最近修改：${meta.localUpdatedAt || '-'} | 最近同步：${meta.lastSyncedAt || '-'} | 云端版本：${meta.lastRemoteUpdatedAt || '-'}`;
         }
 
         function renderSyncSettings() {
@@ -1408,7 +1389,7 @@
 
         async function testCloudConnection() {
             const result = await cloudRequest('/api/health', { method: 'GET' });
-            setSyncStatus('后端与坚果云连接正常。', 'success');
+            setSyncStatus('后端连接正常。', 'success');
             return result;
         }
 
@@ -1417,7 +1398,7 @@
                 if (!silent) setSyncStatus('未配置云同步，当前仅本地保存。', 'warning');
                 return false;
             }
-            if (!silent) setSyncStatus('正在从云端读取数据…', 'info');
+            if (!silent) setSyncStatus('正在从云端读取数据...', 'info');
             const meta = getSyncMeta();
             const result = await cloudRequest('/api/workspace', { method: 'GET' });
             if (!result.exists || !result.payload || !result.payload.data) {
@@ -1453,7 +1434,7 @@
                 return false;
             }
             syncInFlight = true;
-            if (!silent) setSyncStatus('正在上传到云端…', 'info');
+            if (!silent) setSyncStatus('正在上传到云端...', 'info');
             const updatedAt = new Date().toISOString();
             try {
                 const result = await cloudRequest('/api/workspace', {
@@ -1486,7 +1467,7 @@
             const settings = getSyncSettings();
             if (!settings.autoSync || !isCloudConfigured()) return;
             clearTimeout(syncDebounceTimer);
-            setSyncStatus('本地已保存，等待自动同步…', 'info');
+            setSyncStatus('本地已保存，等待自动同步...', 'info');
             syncDebounceTimer = setTimeout(() => {
                 pushRemoteData({ silent: true }).catch(err => setSyncStatus(`自动同步失败：${err.message}`, 'danger'));
             }, 1200);
@@ -1635,9 +1616,10 @@
             });
         }
 
-        // 起居打卡与考勤
+        // 璧峰眳鎵撳崱涓庤€冨嫟
         function initCheckin() {
             const t = getTodayStr();
+            ensureDateDataExists(t);
             document.getElementById('btn-wake').onclick = () => { D.sleepData[t].wake = getTimeStr(); D.sleepData[t].wakeOk = (new Date().getHours() < 9); syncAutoPenalties(t); saveData(); updateCheckinUI(); };
             document.getElementById('btn-sleep').onclick = () => { const now=new Date(), h=now.getHours(); const target = h>=0&&h<5?getTodayStr(-1):t; ensureDateDataExists(target); D.sleepData[target].sleep = getTimeStr(); D.sleepData[target].sleepOk = (h>=18&&(h<23||(h===23&&now.getMinutes()<=30))); syncAutoPenalties(target); saveData(); updateCheckinUI(); };
             document.getElementById('work-checkin').onclick = () => {
@@ -1659,6 +1641,7 @@
             document.getElementById('cal-prev').onclick = () => { currentCalDate.setMonth(currentCalDate.getMonth()-1); renderCheckinCalendar(); };
             document.getElementById('cal-next').onclick = () => { currentCalDate.setMonth(currentCalDate.getMonth()+1); renderCheckinCalendar(); };
             updateCheckinUI();
+            renderCheckinCalendar();
         }
 
         function updateCheckinUI() {
@@ -1667,8 +1650,8 @@
             const wd = D.checkinData[t].work;
             const bonusInfo = getBonusInfo(t);
             const wb = document.getElementById('btn-wake'), sb = document.getElementById('btn-sleep');
-            if(sd.wake){ document.getElementById('wake-time-display').textContent=`已打卡: ${sd.wake}`; wb.disabled=true; wb.classList.add('opacity-50'); } else { document.getElementById('wake-time-display').textContent=`-`; wb.disabled=false; wb.classList.remove('opacity-50'); }
-            if(sd.sleep){ document.getElementById('sleep-time-display').textContent=`已打卡: ${sd.sleep}`; sb.disabled=true; sb.classList.add('opacity-50'); } else { document.getElementById('sleep-time-display').textContent=`-`; sb.disabled=false; sb.classList.remove('opacity-50'); }
+            if(sd.wake){ document.getElementById('wake-time-display').textContent=`已打卡 ${sd.wake}`; wb.disabled=true; wb.classList.add('opacity-50'); } else { document.getElementById('wake-time-display').textContent=`-`; wb.disabled=false; wb.classList.remove('opacity-50'); }
+            if(sd.sleep){ document.getElementById('sleep-time-display').textContent=`已打卡 ${sd.sleep}`; sb.disabled=true; sb.classList.add('opacity-50'); } else { document.getElementById('sleep-time-display').textContent=`-`; sb.disabled=false; sb.classList.remove('opacity-50'); }
             const inB = document.getElementById('work-checkin');
             const outB = document.getElementById('work-checkout');
             inB.disabled = wd.checkIn !== null;
@@ -1682,6 +1665,7 @@
         }
 
         function renderCheckinCalendar() {
+            try {
             const y = currentCalDate.getFullYear(), m = currentCalDate.getMonth();
             const yearKey = String(y);
             if (!holidayCache[yearKey] && !HOLIDAY_FALLBACK[yearKey]) {
@@ -1689,12 +1673,13 @@
                     if (currentCalDate.getFullYear() === y && currentCalDate.getMonth() === m) renderCheckinCalendar();
                 });
             }
-            document.getElementById('cal-month-year').textContent = `${y}年${m+1}月`;
+            document.getElementById('cal-month-year').textContent = `${y}年${m + 1}月`;
             const firstDay = new Date(y, m, 1).getDay(), daysInM = new Date(y, m+1, 0).getDate();
             const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
             for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
             for(let i=1; i<=daysInM; i++) {
                 const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                ensureDateDataExists(dStr);
                 const sd = D.sleepData[dStr] || {}, cd = normalizeCheckinRecord(D.checkinData[dStr]);
                 const holiday = getHolidayStatus(dStr);
                 const bonusInfo = getBonusInfo(dStr);
@@ -1708,17 +1693,24 @@
                 else if(cd?.work?.checkIn || cd?.work?.checkOut) dots += '<span class="w-1.5 h-1.5 bg-danger rounded-full"></span>';
                 if(bonusInfo.earned) dots += '<span class="w-1.5 h-1.5 bg-warning rounded-full"></span>';
                 const textTone = holiday.kind === 'holiday' ? 'text-red-600' : (holiday.kind === 'makeup' ? 'text-amber-600' : 'text-textmain');
-                grid.innerHTML += `<div class="py-1 flex flex-col items-center justify-center rounded-lg ${dStr===getTodayStr()?'bg-blue-50':''}" title="${holiday.label}${bonusInfo.earned ? ' ｜ 已获得 Bonus +1' : ''}"><span class="text-xs font-bold mb-0.5 ${textTone}">${i}</span><div class="text-[10px] h-3 leading-3 ${textTone}">${holiday.shortLabel}</div><div class="flex gap-0.5 h-1.5 mt-0.5">${dots}</div></div>`;
+                const titleParts = [holiday.label];
+                if (bonusInfo.earned) titleParts.push(`已获得 Bonus +${bonusInfo.total}`);
+                grid.innerHTML += `<div class="py-1 flex flex-col items-center justify-center rounded-lg ${dStr===getTodayStr()?'bg-blue-50':''}" title="${titleParts.join('｜')}"><span class="text-xs font-bold mb-0.5 ${textTone}">${i}</span><div class="text-[10px] h-3 leading-3 ${textTone}">${holiday.shortLabel}</div><div class="flex gap-0.5 h-1.5 mt-0.5">${dots}</div></div>`;
+            }
+            } catch (err) {
+                console.error('考勤日历渲染失败：', err);
+                document.getElementById('cal-month-year').textContent = `${currentCalDate.getFullYear()}年${currentCalDate.getMonth() + 1}月`;
+                document.getElementById('cal-grid').innerHTML = '<div class="col-span-7 py-6 text-center text-sm text-danger font-bold">考勤日历渲染失败，请刷新页面后重试</div>';
             }
         }
 
-        // 时间块日历
+        // 鏃堕棿鍧楁棩鍘?
         function initTimeBlocksCalendar() {
             const dp = document.getElementById('block-date-picker'); dp.value = getTodayStr();
             dp.addEventListener('change', e => renderTimeBlocksCalendar(e.target.value));
             document.getElementById('btn-add-block').addEventListener('click', () => {
                 const date = dp.value, start = document.getElementById('tb-start').value, end = document.getElementById('tb-end').value, cat = document.getElementById('tb-cat').value, desc = document.getElementById('tb-desc').value.trim();
-                if(!start || !end || !desc) return alert('请填写完整时段信息');
+                if(!start || !end || !desc) return alert('请填写完整的时间段信息');
                 ensureDateDataExists(date); D.timeBlocks[date].push({ id: 'b_'+Date.now(), start, end, category: cat, desc });
                 document.getElementById('tb-desc').value = ''; saveData(); renderTimeBlocksCalendar(date);
             });
@@ -1746,10 +1738,10 @@
         }
 
         window.deleteTimeBlock = function(dateStr, id) {
-            if(confirm('删除此时段记录？')) { D.timeBlocks[dateStr] = D.timeBlocks[dateStr].filter(x => x.id !== id); saveData(); renderTimeBlocksCalendar(dateStr); }
+            if(confirm('删除这个时间段记录？')) { D.timeBlocks[dateStr] = D.timeBlocks[dateStr].filter(x => x.id !== id); saveData(); renderTimeBlocksCalendar(dateStr); }
         }
 
-        // ================= Todo 核心强化部分 =================
+        // ================= Todo 鏍稿績寮哄寲閮ㄥ垎 =================
         function initTasks() {
             const addBtn = document.getElementById('btn-add-todo');
             const input = document.getElementById('new-todo-input');
@@ -1781,7 +1773,7 @@
             const todayTodos = D.todoData[getTodayStr()] || [];
             
             if (todayTodos.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">今天还没有安排任务哦</div>';
+                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">今天还没有安排任务</div>';
                 return;
             }
 
@@ -1832,7 +1824,7 @@
             focusLeaveState.pending = false;
             focusLeaveState.reason = '';
             if (isProbablyMobileDevice()) {
-                const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 15 分钟内逃离界面：记惩罚点\n- 15-45 分钟逃离界面：仅提醒\n- 45 分钟以上逃离界面：奖励 Bonus');
+                const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 15 分钟内确认离开：扣 2 点\n- 15-45 分钟确认离开：扣 1 点\n- 满 45 分钟正常结束或确认离开：奖励 1 Bonus');
                 if (enableGuard) await activateMobileFocusMode(n);
                 else setMobileFocusHint(false);
             } else {
@@ -1879,7 +1871,7 @@
             }
         }
 
-        // 习惯打卡
+        // 涔犳儻鎵撳崱
         function initHabits() {
             const dp = document.getElementById('habit-date-picker'); dp.value = getTodayStr();
             dp.addEventListener('change', e => renderHabitsForDate(e.target.value));
@@ -1912,7 +1904,7 @@
         }
 
         window.deleteHabit = function(id, dateStr) {
-            if(confirm('删除习惯？')) { D.habitConfig = D.habitConfig.filter(x => x.id !== id); saveData(); renderHabitsForDate(dateStr); }
+            if(confirm('删除这个习惯？')) { D.habitConfig = D.habitConfig.filter(x => x.id !== id); saveData(); renderHabitsForDate(dateStr); }
         }
 
         function updateHabitProgress(dateStr) {
@@ -1922,7 +1914,7 @@
             document.getElementById('habit-progress-text').textContent = `完成度 ${pct}%`; document.getElementById('habit-progress-bar').style.width = `${pct}%`;
         }
 
-        // ================= 简化并修复每日复盘 =================
+        // ================= 每日复盘 =================
         function initJournal() {
             const dp = document.getElementById('journal-date-picker');
             dp.value = getTodayStr(); // 默认显示今天
@@ -2182,21 +2174,6 @@
         function initFocusGuard() {
             document.addEventListener('visibilitychange', () => {
                 if (focusGuard.active && document.hidden) recordFocusGuardViolation('切到后台');
-            });
-            window.addEventListener('blur', () => {
-                if (focusGuard.active) recordFocusGuardViolation('页面失焦');
-            });
-            document.addEventListener('fullscreenchange', () => {
-                if (focusGuard.active && focusGuard.immersive && !document.fullscreenElement) {
-                    recordFocusGuardViolation('退出全屏');
-                }
-            });
-        }
-
-        // 启动挂载
-        function initFocusGuard() {
-            document.addEventListener('visibilitychange', () => {
-                if (focusGuard.active && document.hidden) recordFocusGuardViolation('切到后台');
                 if (focusGuard.active && !document.hidden && focusLeaveState.pending) showFocusLeaveConfirm();
             });
             window.addEventListener('blur', () => {
@@ -2231,3 +2208,4 @@
     </script>
 </body>
 </html>
+
