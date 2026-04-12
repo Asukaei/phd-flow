@@ -597,6 +597,98 @@
             return {};
         }
 
+        function normalizeDataStore(raw = {}) {
+            const normalized = {};
+
+            DATA_KEYS.forEach(key => {
+                const fallback = getDefaultDataValue(key);
+                const value = raw?.[key];
+
+                if (Array.isArray(fallback)) {
+                    normalized[key] = Array.isArray(value) ? value : fallback;
+                    return;
+                }
+
+                if (fallback && typeof fallback === 'object') {
+                    normalized[key] = (value && typeof value === 'object' && !Array.isArray(value))
+                        ? { ...fallback, ...value }
+                        : { ...fallback };
+                    return;
+                }
+
+                normalized[key] = value ?? fallback;
+            });
+
+            normalized.phoneResistData.records = (normalized.phoneResistData.records && typeof normalized.phoneResistData.records === 'object' && !Array.isArray(normalized.phoneResistData.records))
+                ? normalized.phoneResistData.records
+                : {};
+            normalized.phoneResistData.totalCount = Number(normalized.phoneResistData.totalCount) || 0;
+
+            normalized.penaltyData.records = (normalized.penaltyData.records && typeof normalized.penaltyData.records === 'object' && !Array.isArray(normalized.penaltyData.records))
+                ? normalized.penaltyData.records
+                : {};
+            normalized.bonusData.records = (normalized.bonusData.records && typeof normalized.bonusData.records === 'object' && !Array.isArray(normalized.bonusData.records))
+                ? normalized.bonusData.records
+                : {};
+
+            ['checkinData', 'taskData', 'journalData', 'timeBlocks', 'habitRecords', 'sleepData', 'todoData'].forEach(key => {
+                normalized[key] = (normalized[key] && typeof normalized[key] === 'object' && !Array.isArray(normalized[key]))
+                    ? normalized[key]
+                    : {};
+            });
+
+            normalized.habitConfig = Array.isArray(normalized.habitConfig) ? normalized.habitConfig : [];
+            normalized.unlockedAchievements = Array.isArray(normalized.unlockedAchievements) ? normalized.unlockedAchievements : [];
+
+            Object.keys(normalized.checkinData).forEach(dateStr => {
+                normalized.checkinData[dateStr] = normalizeCheckinRecord(normalized.checkinData[dateStr]);
+            });
+
+            Object.keys(normalized.phoneResistData.records).forEach(dateStr => {
+                const item = normalized.phoneResistData.records[dateStr];
+                normalized.phoneResistData.records[dateStr] = {
+                    count: Number(item?.count) || 0,
+                    history: Array.isArray(item?.history) ? item.history : []
+                };
+            });
+
+            Object.keys(normalized.penaltyData.records).forEach(dateStr => {
+                if (!Array.isArray(normalized.penaltyData.records[dateStr])) normalized.penaltyData.records[dateStr] = [];
+            });
+
+            Object.keys(normalized.bonusData.records).forEach(dateStr => {
+                if (!Array.isArray(normalized.bonusData.records[dateStr])) normalized.bonusData.records[dateStr] = [];
+            });
+
+            ['taskData', 'timeBlocks', 'todoData'].forEach(key => {
+                Object.keys(normalized[key]).forEach(dateStr => {
+                    if (!Array.isArray(normalized[key][dateStr])) normalized[key][dateStr] = [];
+                });
+            });
+
+            Object.keys(normalized.habitRecords).forEach(dateStr => {
+                const item = normalized.habitRecords[dateStr];
+                normalized.habitRecords[dateStr] = (item && typeof item === 'object' && !Array.isArray(item)) ? item : {};
+            });
+
+            Object.keys(normalized.journalData).forEach(dateStr => {
+                const item = normalized.journalData[dateStr];
+                normalized.journalData[dateStr] = (item && typeof item === 'object' && !Array.isArray(item)) ? item : {};
+            });
+
+            Object.keys(normalized.sleepData).forEach(dateStr => {
+                const item = normalized.sleepData[dateStr];
+                normalized.sleepData[dateStr] = {
+                    wake: item?.wake || null,
+                    wakeOk: !!item?.wakeOk,
+                    sleep: item?.sleep || null,
+                    sleepOk: !!item?.sleepOk
+                };
+            });
+
+            return normalized;
+        }
+
         function loadHolidayCache() {
             try {
                 holidayCache = JSON.parse(localStorage.getItem(HOLIDAY_CACHE_KEY)) || {};
@@ -875,13 +967,15 @@
         }
 
         function loadLocalData() {
+            const raw = {};
             DATA_KEYS.forEach(k => {
                 try {
-                    D[k] = JSON.parse(localStorage.getItem(k)) || getDefaultDataValue(k);
+                    raw[k] = JSON.parse(localStorage.getItem(k)) || getDefaultDataValue(k);
                 } catch (e) {
-                    D[k] = getDefaultDataValue(k);
+                    raw[k] = getDefaultDataValue(k);
                 }
             });
+            D = normalizeDataStore(raw);
         }
 
         function writeLocalData(touch = true) {
@@ -1010,7 +1104,7 @@
                 if (!silent) setSyncStatus('本地数据更新，已自动上传覆盖云端。', 'success');
                 return true;
             }
-            D = result.payload.data;
+            D = normalizeDataStore(result.payload.data);
             ensureDateDataExists(getTodayStr());
             writeLocalData(false);
             saveSyncMeta({
