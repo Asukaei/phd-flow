@@ -49,9 +49,59 @@
         /* 强制所有输入框字体大于 16px，彻底杜绝 iOS 自动放大页面破坏布局 */
         input, select, textarea { font-size: 16px !important; }
         * { -webkit-tap-highlight-color: transparent; }
+        .focus-reminder-backdrop { backdrop-filter: blur(10px); background: rgba(34, 44, 67, 0.42); }
+        .focus-reminder-card { background: radial-gradient(circle at top left, rgba(255,255,255,0.92), rgba(245,246,248,0.96) 38%, rgba(232,238,247,0.96) 100%); box-shadow: 0 24px 80px -24px rgba(61, 85, 122, 0.45); }
+        .focus-reminder-ring { background: conic-gradient(from 210deg, rgba(159,188,219,0.18), rgba(187,174,204,0.95), rgba(238,203,168,0.9), rgba(159,188,219,0.18)); }
+        .focus-reminder-show { animation: focusReminderIn 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes focusReminderIn {
+            0% { transform: translateY(20px) scale(0.96); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-bglight text-textmain font-sans min-h-screen pb-20">
+    <div id="focus-reminder-modal" class="hidden fixed inset-0 z-[90] items-center justify-center p-4 sm:p-6">
+        <div class="focus-reminder-backdrop absolute inset-0"></div>
+        <div class="focus-reminder-card focus-reminder-show relative w-full max-w-md rounded-[2rem] border border-white/70 p-6 sm:p-7 overflow-hidden">
+            <div class="absolute -top-16 -right-12 w-36 h-36 rounded-full bg-secondary/10 blur-2xl"></div>
+            <div class="absolute -bottom-16 -left-10 w-32 h-32 rounded-full bg-accent/20 blur-2xl"></div>
+            <div class="relative">
+                <div class="flex items-start justify-between gap-4 mb-5">
+                    <div class="flex items-center gap-4">
+                        <div class="focus-reminder-ring w-14 h-14 rounded-2xl p-[2px] shadow-lg shadow-secondary/15">
+                            <div class="w-full h-full rounded-2xl bg-white/85 flex items-center justify-center text-secondary text-2xl">
+                                <i class="fa fa-child"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.25em] text-secondary/70">Focus Break</p>
+                            <h3 class="text-xl sm:text-2xl font-black text-textmain">该起来活动一下了</h3>
+                        </div>
+                    </div>
+                    <button id="focus-reminder-close" class="w-9 h-9 rounded-full bg-white/80 border border-gray-200 text-gray-400 hover:text-textmain transition-colors">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <div class="rounded-2xl bg-white/75 border border-white/70 px-4 py-4 sm:px-5 sm:py-5 mb-5">
+                    <div class="flex items-end justify-between gap-4">
+                        <div>
+                            <div class="text-sm font-bold text-textmuted mb-1">本轮已专注</div>
+                            <div id="focus-reminder-elapsed" class="text-3xl sm:text-4xl font-black text-secondary leading-none">45 分钟</div>
+                        </div>
+                        <div class="text-right text-xs sm:text-sm font-bold text-textmuted">
+                            <div>建议站起 2-5 分钟</div>
+                            <div>拉伸腰背，看看远处</div>
+                        </div>
+                    </div>
+                </div>
+                <p id="focus-reminder-message" class="text-sm sm:text-base leading-7 font-medium text-textmain/90 mb-6">专注够久了。先离开屏幕活动一下，再回来继续，会比硬扛更稳。</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="focus-reminder-ok" class="flex-1 bg-secondary text-white font-black py-3 rounded-2xl shadow-lg shadow-secondary/20">我去活动一下</button>
+                    <button id="focus-reminder-continue" class="flex-1 bg-white/85 text-textmain border border-gray-200 font-black py-3 rounded-2xl">继续专注</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-[1200px]">
         
         <header class="mb-6 sm:mb-10 text-center">
@@ -527,6 +577,7 @@
         ];
 
         let currentTask = null; let taskTimer = null; 
+        let focusReminderVisible = false;
         let charts = { rate: null, period: null, duration: null, phone: null, sleep: null, habit: null };
         let currentCalDate = new Date();
         const SYNC_SETTINGS_KEY = 'phdWorkspaceCloudSyncSettings';
@@ -964,6 +1015,37 @@
             box.classList.remove('fixed', 'inset-3', 'z-40', 'overflow-auto');
             setMobileFocusHint(false);
             await exitFocusFullscreen();
+        }
+
+        function hideFocusReminder() {
+            const modal = document.getElementById('focus-reminder-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            focusReminderVisible = false;
+        }
+
+        function showFocusReminder(elapsedMin) {
+            const modal = document.getElementById('focus-reminder-modal');
+            if (!modal) return;
+            document.getElementById('focus-reminder-elapsed').textContent = `${elapsedMin} 分钟`;
+            document.getElementById('focus-reminder-message').textContent = `你已经连续专注 ${elapsedMin} 分钟了。现在起身走两步、转转肩颈、活动一下腰背，再回来继续更稳。`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            focusReminderVisible = true;
+        }
+
+        function initFocusReminder() {
+            ['focus-reminder-close', 'focus-reminder-ok', 'focus-reminder-continue'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', hideFocusReminder);
+            });
+            const modal = document.getElementById('focus-reminder-modal');
+            if (modal) {
+                modal.addEventListener('click', e => {
+                    if (e.target === modal) hideFocusReminder();
+                });
+            }
         }
 
         function loadLocalData() {
@@ -1453,6 +1535,7 @@
                         duration: Math.floor((Date.now() - currentTask.startTimestamp) / 60000)
                     }); 
                     currentTask = null; 
+                    hideFocusReminder();
                     document.getElementById('current-task-container').classList.add('hidden'); 
                     deactivateMobileFocusMode();
                     saveData(); 
@@ -1503,9 +1586,10 @@
         };
 
         window.startTask = async n => { 
-            currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now()}; 
+            currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now(), breakReminderCount: 0}; 
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
+            hideFocusReminder();
             if (isProbablyMobileDevice()) {
                 const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 15 分钟内逃离界面：记惩罚点\n- 15-45 分钟逃离界面：仅提醒\n- 45 分钟以上逃离界面：奖励 Bonus');
                 if (enableGuard) await activateMobileFocusMode(n);
@@ -1515,8 +1599,15 @@
             }
             updateSidebar();
             taskTimer = setInterval(() => {
+                if (!currentTask) return;
                 const e = Date.now() - currentTask.startTimestamp; 
+                const elapsedMin = Math.floor(e / 60000);
+                const nextReminderCount = Math.floor(elapsedMin / 45);
                 document.getElementById('current-task-time').textContent = `${String(Math.floor(e/3600000)).padStart(2,'0')}:${String(Math.floor((e%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((e%60000)/1000)).padStart(2,'0')}`;
+                if (nextReminderCount > currentTask.breakReminderCount) {
+                    currentTask.breakReminderCount = nextReminderCount;
+                    if (!focusReminderVisible) showFocusReminder(nextReminderCount * 45);
+                }
             }, 1000); 
         };
 
@@ -1847,6 +1938,7 @@
         // 启动挂载
         document.addEventListener('DOMContentLoaded', async () => {
             startClock();
+            initFocusReminder();
             initSync();
             try {
                 await initData();
