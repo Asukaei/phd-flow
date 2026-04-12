@@ -624,13 +624,23 @@
             return normalized;
         }
 
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
         async function ensureHolidayYearLoaded(year) {
             const yearKey = String(year);
             if (holidayCache[yearKey]) return holidayCache[yearKey];
             if (holidayLoadingYears.has(yearKey)) return HOLIDAY_FALLBACK[yearKey] || null;
             holidayLoadingYears.add(yearKey);
             try {
-                const res = await fetch(`https://api.jiejiariapi.com/v1/holidays/${yearKey}`);
+                const res = await fetchWithTimeout(`https://api.jiejiariapi.com/v1/holidays/${yearKey}`, {}, 6000);
                 if (res.ok) {
                     const normalized = normalizeHolidayApiPayload(await res.json());
                     if (normalized) {
@@ -959,11 +969,21 @@
                 'X-Workspace-Token': accessToken,
                 ...(options.headers || {})
             };
-            const res = await fetch(`${apiBase}${path}`, { ...options, headers });
+            const res = await fetchWithTimeout(`${apiBase}${path}`, { ...options, headers }, 8000);
             let body = null;
             try { body = await res.json(); } catch (e) { body = null; }
             if (!res.ok) throw new Error((body && body.error) || `请求失败：${res.status}`);
             return body;
+        }
+
+        function startClock() {
+            const clockEl = document.getElementById('current-date-time');
+            if (!clockEl) return;
+            const renderClock = () => {
+                clockEl.textContent = new Date().toLocaleString();
+            };
+            renderClock();
+            setInterval(renderClock, 1000);
         }
 
         async function testCloudConnection() {
@@ -1732,11 +1752,16 @@
 
         // 启动挂载
         document.addEventListener('DOMContentLoaded', async () => {
+            startClock();
             initSync();
-            await initData();
+            try {
+                await initData();
+            } catch (err) {
+                console.error('初始化失败：', err);
+                setSyncStatus(`初始化失败，当前尝试继续使用本地界面：${err.message}`, 'danger');
+            }
             initNavigation(); initCheckin(); initTimeBlocksCalendar(); initTasks(); initPhone(); initHabits(); initJournal(); initStats(); initFocusGuard();
             updateSidebar(); checkAchievements(); renderSyncMeta(); renderPenaltySummary();
-            setInterval(() => { document.getElementById('current-date-time').textContent = new Date().toLocaleString(); }, 1000);
         });
     </script>
 </body>
