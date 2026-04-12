@@ -268,6 +268,8 @@
                             <div id="current-task-container" class="bg-white border-2 border-secondary rounded-2xl p-5 sm:p-6 hidden shadow-lg">
                                 <div class="flex flex-col items-center text-center">
                                     <span class="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2 sm:mb-3">● 正在专注心流</span>
+                                    <div id="mobile-focus-badge" class="hidden text-[11px] sm:text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full mb-2">手机端约束模式已开启</div>
+                                    <div id="mobile-focus-tip" class="hidden text-xs text-gray-500 font-bold mb-3">切后台或退出全屏会自动记惩罚点</div>
                                     <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
                                     <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 mb-3 sm:mb-4 font-mono tracking-wider" id="current-task-time">00:00:00</div>
                                     <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow transition-transform active:scale-95">结束专注并记录时间</button>
@@ -336,7 +338,7 @@
                                 <button id="btn-resist-success" class="flex-1 bg-success text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-check mr-1 sm:mr-2"></i>成功</button>
                                 <button id="btn-resist-fail" class="flex-1 bg-danger text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-times mr-1 sm:mr-2"></i>没忍住</button>
                             </div>
-                            <p class="text-xs text-danger/80 font-bold">规则：每次“没忍住”自动记 1 个惩罚点。</p>
+                            <p class="text-xs text-danger/80 font-bold">规则：每次“没忍住”自动记 1 个惩罚点；迟到/早退/晚起/晚睡等会按打卡信息自动计分。</p>
                         </div>
                     </div>
 
@@ -344,7 +346,7 @@
                         <div class="flex flex-col lg:flex-row lg:items-end gap-3 sm:gap-4">
                             <div class="flex-1">
                                 <label class="block text-xs sm:text-sm font-bold text-amber-900 mb-2">惩罚原因</label>
-                                <input type="text" id="penalty-reason-input" placeholder="例如：迟到、摆烂、任务失守" class="w-full px-4 py-2.5 sm:py-3 bg-white border border-amber-200 rounded-xl text-sm shadow-sm">
+                                <input type="text" id="penalty-reason-input" placeholder="例如：摆烂、任务失守、无效社交" class="w-full px-4 py-2.5 sm:py-3 bg-white border border-amber-200 rounded-xl text-sm shadow-sm">
                             </div>
                             <div class="w-full lg:w-40">
                                 <label class="block text-xs sm:text-sm font-bold text-amber-900 mb-2">惩罚等级</label>
@@ -492,7 +494,7 @@
             getJournalStreak: d => { const dates = Object.keys(d.journalData).filter(k => d.journalData[k].proud || d.journalData[k].change).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; }
         };
 
-        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData'];
+        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData'];
         let D = {};
         const CAT_MAP = { study: { label: '学习', color: 'primary' }, work: { label: '科研', color: 'secondary' }, play: { label: '娱乐', color: 'accent' }, meal: { label: '餐饮', color: 'warning' }, rest: { label: '休息', color: 'success' }, waste: { label: '摸鱼', color: 'danger' } };
 
@@ -535,6 +537,13 @@
         let syncQueued = false;
         let holidayCache = {};
         const holidayLoadingYears = new Set();
+        const focusGuard = {
+            active: false,
+            immersive: false,
+            targetTask: '',
+            violationCooldownAt: 0,
+            bonusGranted: false
+        };
         // Source fallback: 国务院办公厅 2026 年节假日安排
         const HOLIDAY_FALLBACK = {
             '2026': {
@@ -583,6 +592,7 @@
         function getDefaultDataValue(key) {
             if (key === 'phoneResistData') return { totalCount: 0, records: {} };
             if (key === 'penaltyData') return { records: {} };
+            if (key === 'bonusData') return { records: {} };
             if (key === 'habitConfig' || key === 'unlockedAchievements') return [];
             return {};
         }
@@ -656,15 +666,21 @@
             const record = normalizeCheckinRecord(D.checkinData[dateStr]);
             const holiday = getHolidayStatus(dateStr);
             const worked = !!record?.work?.checkIn;
-            const earned = worked && holiday.bonusEligible;
+            const holidayBonus = worked && holiday.bonusEligible ? 1 : 0;
+            const focusBonus = (D.bonusData?.records?.[dateStr] || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const total = holidayBonus + focusBonus;
             let label = '-';
-            if (earned) label = holiday.kind === 'holiday' ? '+1 节假日' : '+1 周末';
+            if (total > 0) label = `+${total} Bonus`;
             else if (!worked && holiday.bonusEligible) label = '可得 +1';
-            return { earned, label, holiday };
+            return { earned: total > 0, total, label, holiday, holidayBonus, focusBonus };
         }
 
         function getTotalBonusCount() {
-            return Object.keys(D.checkinData || {}).reduce((sum, dateStr) => sum + (getBonusInfo(dateStr).earned ? 1 : 0), 0);
+            const allDates = new Set([
+                ...Object.keys(D.checkinData || {}),
+                ...Object.keys(D.bonusData?.records || {})
+            ]);
+            return Array.from(allDates).reduce((sum, dateStr) => sum + getBonusInfo(dateStr).total, 0);
         }
 
         function getMonthKey(dateStr = getTodayStr()) {
@@ -675,11 +691,71 @@
             if (!D.penaltyData.records[dateStr]) D.penaltyData.records[dateStr] = [];
         }
 
+        function ensureBonusDateExists(dateStr) {
+            if (!D.bonusData.records[dateStr]) D.bonusData.records[dateStr] = [];
+        }
+
         function addPenaltyRecord({ dateStr = getTodayStr(), points = 1, reason = '', source = 'manual' }) {
             ensurePenaltyDateExists(dateStr);
             D.penaltyData.records[dateStr].unshift({
                 time: getTimeStr(),
                 points: Number(points) || 1,
+                reason: reason || '未填写原因',
+                source
+            });
+        }
+
+        function upsertAutoPenalty({ dateStr = getTodayStr(), points = 1, reason = '', source }) {
+            ensurePenaltyDateExists(dateStr);
+            const items = D.penaltyData.records[dateStr];
+            const existingIndex = items.findIndex(item => item.source === source);
+            if (existingIndex >= 0) {
+                if (points > 0) {
+                    items[existingIndex] = { ...items[existingIndex], points, reason };
+                } else {
+                    items.splice(existingIndex, 1);
+                }
+                return;
+            }
+            if (points > 0) addPenaltyRecord({ dateStr, points, reason, source });
+        }
+
+        function syncAutoPenalties(dateStr = getTodayStr()) {
+            ensureDateDataExists(dateStr);
+            const checkin = normalizeCheckinRecord(D.checkinData[dateStr]);
+            const sleep = D.sleepData[dateStr] || {};
+
+            upsertAutoPenalty({
+                dateStr,
+                points: checkin?.work?.checkIn && !checkin.work.status.checkIn ? 1 : 0,
+                reason: '上班迟到',
+                source: 'auto-late-checkin'
+            });
+            upsertAutoPenalty({
+                dateStr,
+                points: checkin?.work?.checkOut && !checkin.work.status.checkOut ? 1 : 0,
+                reason: '下班未达标',
+                source: 'auto-early-checkout'
+            });
+            upsertAutoPenalty({
+                dateStr,
+                points: sleep.wake && !sleep.wakeOk ? 1 : 0,
+                reason: '起床未达标',
+                source: 'auto-late-wake'
+            });
+            upsertAutoPenalty({
+                dateStr,
+                points: sleep.sleep && !sleep.sleepOk ? 1 : 0,
+                reason: '睡觉未达标',
+                source: 'auto-late-sleep'
+            });
+        }
+
+        function addBonusRecord({ dateStr = getTodayStr(), amount = 1, reason = '', source = 'manual' }) {
+            ensureBonusDateExists(dateStr);
+            D.bonusData.records[dateStr].unshift({
+                time: getTimeStr(),
+                amount: Number(amount) || 1,
                 reason: reason || '未填写原因',
                 source
             });
@@ -701,13 +777,91 @@
             Object.entries(D.penaltyData.records || {}).forEach(([day, items]) => {
                 if (day.startsWith(monthKey)) penaltyPoints += (items || []).reduce((sum, item) => sum + (Number(item.points) || 0), 0);
             });
-            Object.keys(D.checkinData || {}).forEach(day => {
-                if (day.startsWith(monthKey) && getBonusInfo(day).earned) bonusCount++;
+            const allDates = new Set([
+                ...Object.keys(D.checkinData || {}),
+                ...Object.keys(D.bonusData?.records || {})
+            ]);
+            Array.from(allDates).forEach(day => {
+                if (day.startsWith(monthKey)) bonusCount += getBonusInfo(day).total;
             });
             const offsetPoints = bonusCount * 2;
             const netPoints = Math.max(0, penaltyPoints - offsetPoints);
             const saving = getPenaltySavingAmount(netPoints);
             return { monthKey, penaltyPoints, bonusCount, offsetPoints, netPoints, saving };
+        }
+
+        function isProbablyMobileDevice() {
+            const ua = navigator.userAgent || '';
+            const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+            return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (coarse && window.innerWidth < 1024);
+        }
+
+        async function tryEnterFocusFullscreen() {
+            const el = document.documentElement;
+            if (!document.fullscreenElement && el.requestFullscreen) {
+                try { await el.requestFullscreen(); } catch (err) { console.warn('无法进入全屏：', err); }
+            }
+        }
+
+        async function exitFocusFullscreen() {
+            if (document.fullscreenElement && document.exitFullscreen) {
+                try { await document.exitFullscreen(); } catch (err) { console.warn('退出全屏失败：', err); }
+            }
+        }
+
+        function recordFocusGuardViolation(reason) {
+            const now = Date.now();
+            if (!focusGuard.active || now - focusGuard.violationCooldownAt < 10000) return;
+            focusGuard.violationCooldownAt = now;
+            const elapsedMin = currentTask ? Math.floor((Date.now() - currentTask.startTimestamp) / 60000) : 0;
+            if (elapsedMin < 15) {
+                alert(`你只坚持了 ${elapsedMin} 分钟就逃离了专注界面。15 分钟内离开会记录惩罚点。`);
+                addPenaltyRecord({ points: 2, reason: `手机端专注 ${elapsedMin} 分钟内逃离：${reason}`, source: 'focus-guard' });
+                saveData();
+                renderPenaltySummary();
+                return;
+            }
+            if (elapsedMin < 45) {
+                alert(`你已经坚持了 ${elapsedMin} 分钟。真的不要再坚持一会儿吗？满 45 分钟会获得 Bonus。`);
+                return;
+            }
+            if (!focusGuard.bonusGranted) {
+                focusGuard.bonusGranted = true;
+                addBonusRecord({ amount: 1, reason: `手机端专注满 ${elapsedMin} 分钟后离开界面`, source: 'focus-guard' });
+                saveData();
+                renderPenaltySummary();
+                alert(`你已经坚持了 ${elapsedMin} 分钟，做得不错。予以肯定，并奖励 1 Bonus。`);
+                return;
+            }
+            alert(`你已经坚持了 ${elapsedMin} 分钟，做得不错。继续保持。`);
+        }
+
+        function setMobileFocusHint(visible) {
+            document.getElementById('mobile-focus-badge').classList.toggle('hidden', !visible);
+            document.getElementById('mobile-focus-tip').classList.toggle('hidden', !visible);
+        }
+
+        async function activateMobileFocusMode(taskName) {
+            focusGuard.active = true;
+            focusGuard.immersive = true;
+            focusGuard.targetTask = taskName;
+            focusGuard.violationCooldownAt = 0;
+            focusGuard.bonusGranted = false;
+            const box = document.getElementById('current-task-container');
+            box.classList.add('fixed', 'inset-3', 'z-40', 'overflow-auto');
+            setMobileFocusHint(true);
+            await tryEnterFocusFullscreen();
+        }
+
+        async function deactivateMobileFocusMode() {
+            focusGuard.active = false;
+            focusGuard.immersive = false;
+            focusGuard.targetTask = '';
+            focusGuard.bonusGranted = false;
+            const box = document.getElementById('current-task-container');
+            box.classList.remove('fixed', 'inset-3', 'z-40', 'overflow-auto');
+            setMobileFocusHint(false);
+            await exitFocusFullscreen();
         }
 
         function loadLocalData() {
@@ -948,6 +1102,7 @@
             D.checkinData[dateStr] = normalizeCheckinRecord(D.checkinData[dateStr]);
             if (!D.phoneResistData.records[dateStr]) D.phoneResistData.records[dateStr] = { count: 0, history: [] };
             ensurePenaltyDateExists(dateStr);
+            ensureBonusDateExists(dateStr);
             if (!D.taskData[dateStr]) D.taskData[dateStr] = [];
             if (!D.timeBlocks[dateStr]) D.timeBlocks[dateStr] = [];
             if (!D.sleepData[dateStr]) D.sleepData[dateStr] = { wake: null, wakeOk: false, sleep: null, sleepOk: false };
@@ -990,6 +1145,7 @@
             loadLocalData();
             loadHolidayCache();
             ensureDateDataExists(getTodayStr());
+            syncAutoPenalties(getTodayStr());
             renderSyncSettings();
             writeLocalData(false);
             ensureHolidayYearLoaded(new Date().getFullYear()).then(() => {
@@ -1041,12 +1197,13 @@
         // 起居打卡与考勤
         function initCheckin() {
             const t = getTodayStr();
-            document.getElementById('btn-wake').onclick = () => { D.sleepData[t].wake = getTimeStr(); D.sleepData[t].wakeOk = (new Date().getHours() < 9); saveData(); updateCheckinUI(); };
-            document.getElementById('btn-sleep').onclick = () => { const now=new Date(), h=now.getHours(); const target = h>=0&&h<5?getTodayStr(-1):t; ensureDateDataExists(target); D.sleepData[target].sleep = getTimeStr(); D.sleepData[target].sleepOk = (h>=18&&(h<23||(h===23&&now.getMinutes()<=30))); saveData(); updateCheckinUI(); };
+            document.getElementById('btn-wake').onclick = () => { D.sleepData[t].wake = getTimeStr(); D.sleepData[t].wakeOk = (new Date().getHours() < 9); syncAutoPenalties(t); saveData(); updateCheckinUI(); };
+            document.getElementById('btn-sleep').onclick = () => { const now=new Date(), h=now.getHours(); const target = h>=0&&h<5?getTodayStr(-1):t; ensureDateDataExists(target); D.sleepData[target].sleep = getTimeStr(); D.sleepData[target].sleepOk = (h>=18&&(h<23||(h===23&&now.getMinutes()<=30))); syncAutoPenalties(target); saveData(); updateCheckinUI(); };
             document.getElementById('work-checkin').onclick = () => {
                 const timeStr = getTimeStr();
                 D.checkinData[t].work.checkIn = timeStr;
                 D.checkinData[t].work.status.checkIn = isWorkCheckInOk(timeStr);
+                syncAutoPenalties(t);
                 saveData();
                 updateCheckinUI();
             };
@@ -1054,6 +1211,7 @@
                 const timeStr = getTimeStr();
                 D.checkinData[t].work.checkOut = timeStr;
                 D.checkinData[t].work.status.checkOut = isWorkCheckOutOk(timeStr);
+                syncAutoPenalties(t);
                 saveData();
                 updateCheckinUI();
             };
@@ -1182,6 +1340,7 @@
                     }); 
                     currentTask = null; 
                     document.getElementById('current-task-container').classList.add('hidden'); 
+                    deactivateMobileFocusMode();
                     saveData(); 
                     renderTodayTasksTimeline(); 
                 }
@@ -1229,10 +1388,17 @@
             saveData(); renderTodos();
         };
 
-        window.startTask = n => { 
+        window.startTask = async n => { 
             currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now()}; 
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
+            if (isProbablyMobileDevice()) {
+                const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 15 分钟内逃离界面：记惩罚点\n- 15-45 分钟逃离界面：仅提醒\n- 45 分钟以上逃离界面：奖励 Bonus');
+                if (enableGuard) await activateMobileFocusMode(n);
+                else setMobileFocusHint(false);
+            } else {
+                setMobileFocusHint(false);
+            }
             updateSidebar();
             taskTimer = setInterval(() => {
                 const e = Date.now() - currentTask.startTimestamp; 
@@ -1462,7 +1628,12 @@
             const list = document.getElementById('penalty-history-list');
             list.innerHTML = '';
             (D.penaltyData.records[getTodayStr()] || []).forEach(item => {
-                list.innerHTML += `<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${item.time}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${item.reason}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right"><span class="bg-danger/10 text-danger px-2 py-1 rounded font-bold text-xs">-${item.points}</span></td></tr>`;
+                const sourceTag = item.source?.startsWith('auto-')
+                    ? '<span class="ml-2 bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-bold text-[10px]">自动</span>'
+                    : (item.source === 'manual'
+                        ? '<span class="ml-2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">手动</span>'
+                        : '<span class="ml-2 bg-danger/10 text-danger px-2 py-0.5 rounded font-bold text-[10px]">约束</span>');
+                list.innerHTML += `<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${item.time}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${item.reason}${sourceTag}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right"><span class="bg-danger/10 text-danger px-2 py-1 rounded font-bold text-xs">-${item.points}</span></td></tr>`;
             });
             if (!list.innerHTML) {
                 list.innerHTML = '<tr><td colspan="3" class="px-4 sm:px-6 py-4 text-center text-gray-400 text-sm">今天还没有惩罚记录</td></tr>';
@@ -1545,11 +1716,25 @@
             }
         }
 
+        function initFocusGuard() {
+            document.addEventListener('visibilitychange', () => {
+                if (focusGuard.active && document.hidden) recordFocusGuardViolation('切到后台');
+            });
+            window.addEventListener('blur', () => {
+                if (focusGuard.active) recordFocusGuardViolation('页面失焦');
+            });
+            document.addEventListener('fullscreenchange', () => {
+                if (focusGuard.active && focusGuard.immersive && !document.fullscreenElement) {
+                    recordFocusGuardViolation('退出全屏');
+                }
+            });
+        }
+
         // 启动挂载
         document.addEventListener('DOMContentLoaded', async () => {
             initSync();
             await initData();
-            initNavigation(); initCheckin(); initTimeBlocksCalendar(); initTasks(); initPhone(); initHabits(); initJournal(); initStats();
+            initNavigation(); initCheckin(); initTimeBlocksCalendar(); initTasks(); initPhone(); initHabits(); initJournal(); initStats(); initFocusGuard();
             updateSidebar(); checkAchievements(); renderSyncMeta(); renderPenaltySummary();
             setInterval(() => { document.getElementById('current-date-time').textContent = new Date().toLocaleString(); }, 1000);
         });
