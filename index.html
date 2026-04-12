@@ -79,7 +79,7 @@
                         </div>
                         <div>
                             <p class="text-[11px] font-black uppercase tracking-[0.25em] text-secondary/70">Focus Break</p>
-                            <h3 class="text-xl sm:text-2xl font-black text-textmain">该起来活动一下了</h3>
+                            <h3 id="focus-reminder-title" class="text-xl sm:text-2xl font-black text-textmain">该起来活动一下了</h3>
                         </div>
                     </div>
                     <button id="focus-reminder-close" class="w-9 h-9 rounded-full bg-white/80 border border-gray-200 text-gray-400 hover:text-textmain transition-colors">
@@ -151,6 +151,7 @@
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <button id="focus-leave-stay" class="focus-leave-safe flex-1 text-white font-black py-3.5 rounded-[1.35rem] shadow-[0_18px_36px_-22px_rgba(120,137,179,0.95)]">继续专注</button>
+                    <button id="focus-leave-backpain" class="flex-1 bg-white/90 text-danger border border-danger/15 font-black py-3.5 rounded-[1.35rem] shadow-[0_16px_32px_-24px_rgba(188,96,96,0.4)]">实在腰疼</button>
                     <button id="focus-leave-confirm" class="focus-leave-danger flex-1 text-white font-black py-3.5 rounded-[1.35rem] shadow-[0_18px_36px_-22px_rgba(188,96,96,0.95)]">确认离开并结束</button>
                 </div>
             </div>
@@ -375,7 +376,12 @@
                                     <div id="mobile-focus-badge" class="hidden text-[11px] sm:text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full mb-2">手机端约束模式已开启</div>
                                     <div id="mobile-focus-tip" class="hidden text-xs text-gray-500 font-bold mb-3">切后台或退出全屏会自动记惩罚点</div>
                                     <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
-                                    <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 mb-3 sm:mb-4 font-mono tracking-wider" id="current-task-time">00:00:00</div>
+                                    <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 font-mono tracking-wider" id="current-task-time">00:00:00</div>
+                                    <div class="mt-3 mb-4 sm:mb-5 flex flex-col items-center">
+                                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-[0.28em] text-textmuted/80 mb-2">现实时间</span>
+                                        <div id="current-real-time" class="text-3xl sm:text-4xl font-black text-textmain font-mono tracking-[0.12em]">--:--:--</div>
+                                        <div id="current-backpain-count" class="mt-3 text-xs sm:text-sm font-black text-danger bg-danger/10 px-3 py-1.5 rounded-full">实在腰疼：今日 0 次</div>
+                                    </div>
                                     <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow transition-transform active:scale-95">结束专注并记录时间</button>
                                 </div>
                             </div>
@@ -509,7 +515,7 @@
                         <div class="overflow-x-auto max-h-[260px] sm:max-h-[320px]">
                             <table class="min-w-full text-xs sm:text-sm text-left">
                                 <thead class="text-gray-500 bg-gray-50 uppercase font-bold sticky top-0">
-                                    <tr><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 sm:w-32">鏃堕棿</th><th class="px-4 sm:px-6 py-2 sm:py-3">Bonus 明细</th><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 text-right">Bonus</th></tr>
+                                    <tr><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 sm:w-32">时间</th><th class="px-4 sm:px-6 py-2 sm:py-3">Bonus 明细</th><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 text-right">Bonus</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="bonus-history-list"></tbody>
                             </table>
@@ -608,7 +614,7 @@
             getJournalStreak: d => { const dates = Object.keys(d.journalData).filter(k => d.journalData[k].proud || d.journalData[k].change).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; }
         };
 
-        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData'];
+        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData', 'focusReliefData'];
         let D = {};
         const CAT_MAP = { study: { label: '学习', color: 'primary' }, work: { label: '科研', color: 'secondary' }, play: { label: '娱乐', color: 'accent' }, meal: { label: '餐饮', color: 'warning' }, rest: { label: '休息', color: 'success' }, waste: { label: '摸鱼', color: 'danger' } };
 
@@ -709,6 +715,7 @@
             if (key === 'phoneResistData') return { totalCount: 0, records: {} };
             if (key === 'penaltyData') return { records: {} };
             if (key === 'bonusData') return { records: {} };
+            if (key === 'focusReliefData') return { records: {} };
             if (key === 'habitConfig' || key === 'unlockedAchievements') return [];
             return {};
         }
@@ -746,6 +753,9 @@
             normalized.bonusData.records = (normalized.bonusData.records && typeof normalized.bonusData.records === 'object' && !Array.isArray(normalized.bonusData.records))
                 ? normalized.bonusData.records
                 : {};
+            normalized.focusReliefData.records = (normalized.focusReliefData.records && typeof normalized.focusReliefData.records === 'object' && !Array.isArray(normalized.focusReliefData.records))
+                ? normalized.focusReliefData.records
+                : {};
 
             ['checkinData', 'taskData', 'journalData', 'timeBlocks', 'habitRecords', 'sleepData', 'todoData'].forEach(key => {
                 normalized[key] = (normalized[key] && typeof normalized[key] === 'object' && !Array.isArray(normalized[key]))
@@ -774,6 +784,14 @@
 
             Object.keys(normalized.bonusData.records).forEach(dateStr => {
                 if (!Array.isArray(normalized.bonusData.records[dateStr])) normalized.bonusData.records[dateStr] = [];
+            });
+
+            Object.keys(normalized.focusReliefData.records).forEach(dateStr => {
+                const item = normalized.focusReliefData.records[dateStr];
+                normalized.focusReliefData.records[dateStr] = {
+                    count: Number(item?.count) || 0,
+                    history: Array.isArray(item?.history) ? item.history : []
+                };
             });
 
             ['taskData', 'timeBlocks', 'todoData'].forEach(key => {
@@ -913,6 +931,10 @@
             if (!D.bonusData.records[dateStr]) D.bonusData.records[dateStr] = [];
         }
 
+        function ensureFocusReliefDateExists(dateStr) {
+            if (!D.focusReliefData.records[dateStr]) D.focusReliefData.records[dateStr] = { count: 0, history: [] };
+        }
+
         function addPenaltyRecord({ dateStr = getTodayStr(), points = 1, reason = '', source = 'manual' }) {
             ensurePenaltyDateExists(dateStr);
             D.penaltyData.records[dateStr].unshift({
@@ -989,6 +1011,12 @@
             }
             (D.bonusData.records[dateStr] || []).forEach(item => items.push(item));
             return items;
+        }
+
+        function getFocusReliefAdvice(record) {
+            const count = Number(record?.count) || 0;
+            if (count <= 2) return '';
+            return '今天“实在腰疼”已经用了 3 次以上。建议先把椅子靠背顶住腰，屏幕抬高到视线附近；每 30-45 分钟起身 2-5 分钟，做胸椎伸展、髋屈肌拉伸和轻微后仰；如果是持续刺痛或放射痛，就不要继续硬撑，尽快休息或就医。';
         }
 
         function getPenaltySavingAmount(netPoints) {
@@ -1149,8 +1177,11 @@
         function showFocusReminder(elapsedMin) {
             const modal = document.getElementById('focus-reminder-modal');
             if (!modal) return;
+            document.getElementById('focus-reminder-title').textContent = '该起来活动一下了';
             document.getElementById('focus-reminder-elapsed').textContent = `${elapsedMin} 分钟`;
             document.getElementById('focus-reminder-message').textContent = `你已经连续专注 ${elapsedMin} 分钟了。现在起身走两步、转转肩颈、活动一下腰背，再回来继续更稳。`;
+            document.getElementById('focus-reminder-ok').textContent = '我去活动一下';
+            document.getElementById('focus-reminder-continue').textContent = '继续专注';
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             focusReminderVisible = true;
@@ -1167,6 +1198,19 @@
                     if (e.target === modal) hideFocusReminder();
                 });
             }
+        }
+
+        function updateFocusReliefDisplay() {
+            const el = document.getElementById('current-backpain-count');
+            if (!el) return;
+            const dateStr = getTodayStr();
+            ensureDateDataExists(dateStr);
+            ensureFocusReliefDateExists(dateStr);
+            const count = D.focusReliefData.records[dateStr].count || 0;
+            el.textContent = `实在腰疼：今日 ${count} 次`;
+            el.className = count > 2
+                ? 'mt-3 text-xs sm:text-sm font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full'
+                : 'mt-3 text-xs sm:text-sm font-black text-danger bg-danger/10 px-3 py-1.5 rounded-full';
         }
 
         function finishCurrentTask() {
@@ -1189,18 +1233,46 @@
             document.getElementById('current-task-container').classList.add('hidden');
             deactivateMobileFocusMode();
             saveData();
+            updateFocusReliefDisplay();
             renderTodayTasksTimeline();
             renderPenaltySummary();
         }
 
+        function handleBackPainExit() {
+            if (!currentTask) return;
+            const dateStr = getTodayStr();
+            ensureDateDataExists(dateStr);
+            ensureFocusReliefDateExists(dateStr);
+            const record = D.focusReliefData.records[dateStr];
+            record.count += 1;
+            record.history.unshift({ time: getTimeStr(), task: currentTask.name });
+            const advice = getFocusReliefAdvice(record);
+            finishCurrentTask();
+            if (advice) {
+                showFocusReminder(record.count * 45 || 45);
+                document.getElementById('focus-reminder-title').textContent = '腰背已经在报警了';
+                document.getElementById('focus-reminder-message').textContent = advice;
+                document.getElementById('focus-reminder-elapsed').textContent = `已用 ${record.count} 次`;
+                document.getElementById('focus-reminder-ok').textContent = '知道了';
+                document.getElementById('focus-reminder-continue').textContent = '稍后再看';
+            }
+        }
+
         function initFocusLeaveConfirm() {
             const stay = document.getElementById('focus-leave-stay');
+            const backPainBtn = document.getElementById('focus-leave-backpain');
             const confirmBtn = document.getElementById('focus-leave-confirm');
             const close = document.getElementById('focus-leave-close');
             if (stay) stay.addEventListener('click', () => {
                 focusLeaveState.pending = false;
                 focusLeaveState.reason = '';
                 hideFocusLeaveConfirm();
+            });
+            if (backPainBtn) backPainBtn.addEventListener('click', () => {
+                focusLeaveState.pending = false;
+                focusLeaveState.reason = '实在腰疼';
+                hideFocusLeaveConfirm();
+                handleBackPainExit();
             });
             if (close) close.addEventListener('click', () => {
                 focusLeaveState.pending = false;
@@ -1465,6 +1537,7 @@
             if (!D.phoneResistData.records[dateStr]) D.phoneResistData.records[dateStr] = { count: 0, history: [] };
             ensurePenaltyDateExists(dateStr);
             ensureBonusDateExists(dateStr);
+            ensureFocusReliefDateExists(dateStr);
             if (!D.taskData[dateStr]) D.taskData[dateStr] = [];
             if (!D.timeBlocks[dateStr]) D.timeBlocks[dateStr] = [];
             if (!D.sleepData[dateStr]) D.sleepData[dateStr] = { wake: null, wakeOk: false, sleep: null, sleepOk: false };
@@ -1741,6 +1814,8 @@
             currentTask = {name:n, startTime:getTimeStr(), startTimestamp:Date.now(), breakReminderCount: 0}; 
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
+            document.getElementById('current-real-time').textContent = getTimeStr();
+            updateFocusReliefDisplay();
             hideFocusReminder();
             hideFocusLeaveConfirm();
             focusLeaveState.pending = false;
@@ -1759,6 +1834,7 @@
                 const elapsedMin = Math.floor(e / 60000);
                 const nextReminderCount = Math.floor(elapsedMin / 45);
                 document.getElementById('current-task-time').textContent = `${String(Math.floor(e/3600000)).padStart(2,'0')}:${String(Math.floor((e%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((e%60000)/1000)).padStart(2,'0')}`;
+                document.getElementById('current-real-time').textContent = getTimeStr();
                 if (nextReminderCount > currentTask.breakReminderCount) {
                     currentTask.breakReminderCount = nextReminderCount;
                     if (!focusReminderVisible) showFocusReminder(nextReminderCount * 45);
@@ -2004,10 +2080,10 @@
                 bonusList.innerHTML = '';
                 getBonusRecordsForDate(getTodayStr()).forEach(item => {
                     const sourceTag = item.source === 'holiday'
-                        ? '<span class="ml-2 bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-[10px]">休息日</span>'
+                        ? '<span class="ml-2 inline-flex whitespace-nowrap bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-[10px]">休息日</span>'
                         : (item.source === 'focus-guard'
-                            ? '<span class="ml-2 bg-secondary/10 text-secondary px-2 py-0.5 rounded font-bold text-[10px]">专注</span>'
-                            : '<span class="ml-2 bg-warning/10 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">奖励</span>');
+                            ? '<span class="ml-2 inline-flex whitespace-nowrap bg-secondary/10 text-secondary px-2 py-0.5 rounded font-bold text-[10px]">专注</span>'
+                            : '<span class="ml-2 inline-flex whitespace-nowrap bg-warning/10 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">奖励</span>');
                     bonusList.innerHTML += `<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${item.time || '-'}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${item.reason}${sourceTag}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right"><span class="bg-warning/10 text-warning px-2 py-1 rounded font-bold text-xs">+${item.amount}</span></td></tr>`;
                 });
                 if (!bonusList.innerHTML) {
@@ -2138,6 +2214,7 @@
                 setSyncStatus(`初始化失败，当前尝试继续使用本地界面：${err.message}`, 'danger');
             }
             initNavigation(); initCheckin(); initTimeBlocksCalendar(); initTasks(); initPhone(); initHabits(); initJournal(); initStats(); initFocusGuard();
+            updateFocusReliefDisplay();
             updateSidebar(); checkAchievements(); renderSyncMeta(); renderPenaltySummary();
         });
     </script>
