@@ -79,6 +79,8 @@
                         <div class="space-y-2 sm:space-y-3 text-xs sm:text-sm font-bold">
                             <div class="flex justify-between items-center"><span class="text-gray-400">上班打卡</span><span id="sb-work-in" class="text-gray-300">未打卡</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">下班打卡</span><span id="sb-work-out" class="text-gray-300">未打卡</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-400">今日 Bonus</span><span id="sb-bonus-today" class="text-gray-300">-</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-400">累计 Bonus</span><span id="sb-bonus-total" class="text-gray-300">0</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">手机克制</span><span id="sb-phone" class="text-danger">0 次</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">进行中任务</span><span id="sb-task" class="text-gray-300 truncate max-w-[80px] sm:max-w-[100px] text-right" title="">无</span></div>
                             <div class="flex justify-between items-center"><span class="text-gray-400">每日习惯</span><span id="sb-habit" class="text-gray-300">0%</span></div>
@@ -134,12 +136,12 @@
                             <table class="min-w-[500px] sm:min-w-full text-sm text-left">
                                 <thead class="text-xs text-gray-500 bg-gray-50 uppercase font-bold">
                                     <tr>
-                                        <th class="px-4 sm:px-6 py-3">记录</th><th class="px-4 sm:px-6 py-3">规定上班</th><th class="px-4 sm:px-6 py-3">规定下班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th>
+                                        <th class="px-4 sm:px-6 py-3">记录</th><th class="px-4 sm:px-6 py-3">规定上班</th><th class="px-4 sm:px-6 py-3">规定下班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际上班</th><th class="px-4 sm:px-6 py-3 bg-blue-50/50 text-primary">实际下班</th><th class="px-4 sm:px-6 py-3">Bonus</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="today-checkin-table">
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">工位考勤</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-09:30</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00 及以后</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-out">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">工位考勤</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-09:30</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00 及以后</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-out">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-bonus">-</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -159,6 +161,12 @@
                             <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
                         </div>
                         <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center" id="cal-grid"></div>
+                        <div class="flex flex-wrap gap-3 mt-4 text-[11px] sm:text-xs font-bold text-gray-500">
+                            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-400"></span>法定节假日</span>
+                            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span>周末</span>
+                            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span>调休上班</span>
+                            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-warning"></span>Bonus</span>
+                        </div>
                     </div>
                 </section>
 
@@ -328,6 +336,45 @@
                                 <button id="btn-resist-success" class="flex-1 bg-success text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-check mr-1 sm:mr-2"></i>成功</button>
                                 <button id="btn-resist-fail" class="flex-1 bg-danger text-white py-2.5 sm:py-3 rounded-xl font-bold btn-shadow text-sm"><i class="fa fa-times mr-1 sm:mr-2"></i>没忍住</button>
                             </div>
+                            <p class="text-xs text-danger/80 font-bold">规则：每次“没忍住”自动记 1 个惩罚点。</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+                        <div class="flex flex-col lg:flex-row lg:items-end gap-3 sm:gap-4">
+                            <div class="flex-1">
+                                <label class="block text-xs sm:text-sm font-bold text-amber-900 mb-2">惩罚原因</label>
+                                <input type="text" id="penalty-reason-input" placeholder="例如：迟到、摆烂、任务失守" class="w-full px-4 py-2.5 sm:py-3 bg-white border border-amber-200 rounded-xl text-sm shadow-sm">
+                            </div>
+                            <div class="w-full lg:w-40">
+                                <label class="block text-xs sm:text-sm font-bold text-amber-900 mb-2">惩罚等级</label>
+                                <select id="penalty-points-select" class="w-full px-4 py-2.5 sm:py-3 bg-white border border-amber-200 rounded-xl text-sm font-bold shadow-sm">
+                                    <option value="1">轻度 1 点</option>
+                                    <option value="2">中度 2 点</option>
+                                    <option value="3">重度 3 点</option>
+                                </select>
+                            </div>
+                            <button id="btn-add-penalty" class="w-full lg:w-auto bg-amber-500 text-white py-2.5 sm:py-3 px-5 rounded-xl font-bold btn-shadow text-sm">
+                                <i class="fa fa-minus-circle mr-2"></i>记录惩罚点
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-5">
+                            <div class="bg-white rounded-xl border border-amber-100 p-4">
+                                <div class="text-xs text-gray-500 font-bold mb-1">本月惩罚点</div>
+                                <div class="text-2xl font-black text-danger" id="penalty-month-total">0</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-amber-100 p-4">
+                                <div class="text-xs text-gray-500 font-bold mb-1">本月 Bonus</div>
+                                <div class="text-2xl font-black text-warning" id="bonus-month-total">0</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-amber-100 p-4">
+                                <div class="text-xs text-gray-500 font-bold mb-1">净惩罚点</div>
+                                <div class="text-2xl font-black text-textmain" id="penalty-month-net">0</div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-amber-100 p-4">
+                                <div class="text-xs text-gray-500 font-bold mb-1">应强制储蓄</div>
+                                <div class="text-2xl font-black text-amber-600" id="penalty-month-saving">0 元</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -338,6 +385,17 @@
                                     <tr><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 sm:w-32">时间</th><th class="px-4 sm:px-6 py-2 sm:py-3">原因</th><th class="px-4 sm:px-6 py-2 sm:py-3 w-20 sm:w-32 text-right">状态</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="phone-history-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm mt-6">
+                        <div class="overflow-x-auto max-h-[260px] sm:max-h-[320px]">
+                            <table class="min-w-full text-xs sm:text-sm text-left">
+                                <thead class="text-gray-500 bg-gray-50 uppercase font-bold sticky top-0">
+                                    <tr><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 sm:w-32">时间</th><th class="px-4 sm:px-6 py-2 sm:py-3">原因</th><th class="px-4 sm:px-6 py-2 sm:py-3 w-24 text-right">惩罚点</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" id="penalty-history-list"></tbody>
                             </table>
                         </div>
                     </div>
@@ -372,6 +430,28 @@
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
                             <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">按时起居打卡</h3>
                             <div class="relative w-full h-[180px] sm:h-[220px]"><canvas id="chart-sleep-stats"></canvas></div>
+                        </div>
+                        <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+                            <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">本月奖惩结算</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="rounded-xl bg-danger/5 border border-danger/10 p-3">
+                                    <div class="text-xs text-gray-500 font-bold mb-1">惩罚点</div>
+                                    <div class="text-xl font-black text-danger" id="stats-penalty-total">0</div>
+                                </div>
+                                <div class="rounded-xl bg-warning/10 border border-warning/20 p-3">
+                                    <div class="text-xs text-gray-500 font-bold mb-1">Bonus</div>
+                                    <div class="text-xl font-black text-warning" id="stats-bonus-total">0</div>
+                                </div>
+                                <div class="rounded-xl bg-gray-50 border border-gray-200 p-3">
+                                    <div class="text-xs text-gray-500 font-bold mb-1">净惩罚点</div>
+                                    <div class="text-xl font-black text-textmain" id="stats-penalty-net">0</div>
+                                </div>
+                                <div class="rounded-xl bg-amber-50 border border-amber-200 p-3">
+                                    <div class="text-xs text-gray-500 font-bold mb-1">应储蓄</div>
+                                    <div class="text-xl font-black text-amber-600" id="stats-penalty-saving">0 元</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 font-bold mt-3">规则：1 Bonus = 抵消 2 个惩罚点；月末按净惩罚点结算。</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -412,7 +492,7 @@
             getJournalStreak: d => { const dates = Object.keys(d.journalData).filter(k => d.journalData[k].proud || d.journalData[k].change).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; }
         };
 
-        const DATA_KEYS = ['checkinData', 'phoneResistData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData'];
+        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData'];
         let D = {};
         const CAT_MAP = { study: { label: '学习', color: 'primary' }, work: { label: '科研', color: 'secondary' }, play: { label: '娱乐', color: 'accent' }, meal: { label: '餐饮', color: 'warning' }, rest: { label: '休息', color: 'success' }, waste: { label: '摸鱼', color: 'danger' } };
 
@@ -449,14 +529,185 @@
         let currentCalDate = new Date();
         const SYNC_SETTINGS_KEY = 'phdWorkspaceCloudSyncSettings';
         const SYNC_META_KEY = 'phdWorkspaceCloudSyncMeta';
+        const HOLIDAY_CACHE_KEY = 'phdWorkspaceHolidayCache';
         let syncDebounceTimer = null;
         let syncInFlight = false;
         let syncQueued = false;
+        let holidayCache = {};
+        const holidayLoadingYears = new Set();
+        // Source fallback: 国务院办公厅 2026 年节假日安排
+        const HOLIDAY_FALLBACK = {
+            '2026': {
+                '2026-01-01': { name: '元旦', isOffDay: true },
+                '2026-01-02': { name: '元旦', isOffDay: true },
+                '2026-01-03': { name: '元旦', isOffDay: true },
+                '2026-01-04': { name: '元旦调休', isOffDay: false },
+                '2026-02-14': { name: '春节调休', isOffDay: false },
+                '2026-02-15': { name: '春节', isOffDay: true },
+                '2026-02-16': { name: '春节', isOffDay: true },
+                '2026-02-17': { name: '春节', isOffDay: true },
+                '2026-02-18': { name: '春节', isOffDay: true },
+                '2026-02-19': { name: '春节', isOffDay: true },
+                '2026-02-20': { name: '春节', isOffDay: true },
+                '2026-02-21': { name: '春节', isOffDay: true },
+                '2026-02-22': { name: '春节', isOffDay: true },
+                '2026-02-23': { name: '春节', isOffDay: true },
+                '2026-02-28': { name: '春节调休', isOffDay: false },
+                '2026-04-04': { name: '清明节', isOffDay: true },
+                '2026-04-05': { name: '清明节', isOffDay: true },
+                '2026-04-06': { name: '清明节', isOffDay: true },
+                '2026-05-01': { name: '劳动节', isOffDay: true },
+                '2026-05-02': { name: '劳动节', isOffDay: true },
+                '2026-05-03': { name: '劳动节', isOffDay: true },
+                '2026-05-04': { name: '劳动节', isOffDay: true },
+                '2026-05-05': { name: '劳动节', isOffDay: true },
+                '2026-05-09': { name: '劳动节调休', isOffDay: false },
+                '2026-06-19': { name: '端午节', isOffDay: true },
+                '2026-06-20': { name: '端午节', isOffDay: true },
+                '2026-06-21': { name: '端午节', isOffDay: true },
+                '2026-09-25': { name: '中秋节', isOffDay: true },
+                '2026-09-26': { name: '中秋节', isOffDay: true },
+                '2026-09-27': { name: '中秋节', isOffDay: true },
+                '2026-09-20': { name: '国庆节调休', isOffDay: false },
+                '2026-10-01': { name: '国庆节', isOffDay: true },
+                '2026-10-02': { name: '国庆节', isOffDay: true },
+                '2026-10-03': { name: '国庆节', isOffDay: true },
+                '2026-10-04': { name: '国庆节', isOffDay: true },
+                '2026-10-05': { name: '国庆节', isOffDay: true },
+                '2026-10-06': { name: '国庆节', isOffDay: true },
+                '2026-10-07': { name: '国庆节', isOffDay: true },
+                '2026-10-10': { name: '国庆节调休', isOffDay: false }
+            }
+        };
 
         function getDefaultDataValue(key) {
             if (key === 'phoneResistData') return { totalCount: 0, records: {} };
+            if (key === 'penaltyData') return { records: {} };
             if (key === 'habitConfig' || key === 'unlockedAchievements') return [];
             return {};
+        }
+
+        function loadHolidayCache() {
+            try {
+                holidayCache = JSON.parse(localStorage.getItem(HOLIDAY_CACHE_KEY)) || {};
+            } catch (e) {
+                holidayCache = {};
+            }
+        }
+
+        function saveHolidayCache() {
+            localStorage.setItem(HOLIDAY_CACHE_KEY, JSON.stringify(holidayCache));
+        }
+
+        function normalizeHolidayApiPayload(payload) {
+            if (!payload) return null;
+            if (payload.code && payload.code !== 0) return null;
+            const raw = payload.holidays || payload.data || payload;
+            if (!raw || typeof raw !== 'object') return null;
+            const normalized = {};
+            Object.entries(raw).forEach(([dateStr, item]) => {
+                normalized[dateStr] = {
+                    name: item.name || item.holiday?.name || item.label || '节假日',
+                    isOffDay: item.isOffDay ?? item.isHoliday ?? item.holiday?.isOffDay ?? item.holiday?.holiday ?? false
+                };
+            });
+            return normalized;
+        }
+
+        async function ensureHolidayYearLoaded(year) {
+            const yearKey = String(year);
+            if (holidayCache[yearKey]) return holidayCache[yearKey];
+            if (holidayLoadingYears.has(yearKey)) return HOLIDAY_FALLBACK[yearKey] || null;
+            holidayLoadingYears.add(yearKey);
+            try {
+                const res = await fetch(`https://api.jiejiariapi.com/v1/holidays/${yearKey}`);
+                if (res.ok) {
+                    const normalized = normalizeHolidayApiPayload(await res.json());
+                    if (normalized) {
+                        holidayCache[yearKey] = normalized;
+                        saveHolidayCache();
+                        return normalized;
+                    }
+                }
+            } catch (err) {
+                console.warn('节假日接口读取失败，使用本地/周末兜底：', err);
+            } finally {
+                holidayLoadingYears.delete(yearKey);
+            }
+            return HOLIDAY_FALLBACK[yearKey] || null;
+        }
+
+        function getHolidayStatus(dateStr) {
+            const yearKey = String(dateStr).slice(0, 4);
+            const day = new Date(`${dateStr}T00:00:00`).getDay();
+            const isWeekend = day === 0 || day === 6;
+            const yearMap = holidayCache[yearKey] || HOLIDAY_FALLBACK[yearKey] || {};
+            const entry = yearMap[dateStr];
+
+            if (entry) {
+                if (entry.isOffDay) return { kind: 'holiday', label: entry.name, shortLabel: '休', isOffDay: true, bonusEligible: true };
+                return { kind: 'makeup', label: entry.name, shortLabel: '班', isOffDay: false, bonusEligible: false };
+            }
+            if (isWeekend) return { kind: 'weekend', label: '周末', shortLabel: '周', isOffDay: true, bonusEligible: true };
+            return { kind: 'workday', label: '工作日', shortLabel: '', isOffDay: false, bonusEligible: false };
+        }
+
+        function getBonusInfo(dateStr) {
+            const record = normalizeCheckinRecord(D.checkinData[dateStr]);
+            const holiday = getHolidayStatus(dateStr);
+            const worked = !!record?.work?.checkIn;
+            const earned = worked && holiday.bonusEligible;
+            let label = '-';
+            if (earned) label = holiday.kind === 'holiday' ? '+1 节假日' : '+1 周末';
+            else if (!worked && holiday.bonusEligible) label = '可得 +1';
+            return { earned, label, holiday };
+        }
+
+        function getTotalBonusCount() {
+            return Object.keys(D.checkinData || {}).reduce((sum, dateStr) => sum + (getBonusInfo(dateStr).earned ? 1 : 0), 0);
+        }
+
+        function getMonthKey(dateStr = getTodayStr()) {
+            return String(dateStr).slice(0, 7);
+        }
+
+        function ensurePenaltyDateExists(dateStr) {
+            if (!D.penaltyData.records[dateStr]) D.penaltyData.records[dateStr] = [];
+        }
+
+        function addPenaltyRecord({ dateStr = getTodayStr(), points = 1, reason = '', source = 'manual' }) {
+            ensurePenaltyDateExists(dateStr);
+            D.penaltyData.records[dateStr].unshift({
+                time: getTimeStr(),
+                points: Number(points) || 1,
+                reason: reason || '未填写原因',
+                source
+            });
+        }
+
+        function getPenaltySavingAmount(netPoints) {
+            if (netPoints <= 2) return 0;
+            if (netPoints <= 5) return 50;
+            if (netPoints <= 8) return 100;
+            if (netPoints <= 12) return 200;
+            if (netPoints <= 16) return 300;
+            return 500;
+        }
+
+        function getMonthlySettlement(dateStr = getTodayStr()) {
+            const monthKey = getMonthKey(dateStr);
+            let penaltyPoints = 0;
+            let bonusCount = 0;
+            Object.entries(D.penaltyData.records || {}).forEach(([day, items]) => {
+                if (day.startsWith(monthKey)) penaltyPoints += (items || []).reduce((sum, item) => sum + (Number(item.points) || 0), 0);
+            });
+            Object.keys(D.checkinData || {}).forEach(day => {
+                if (day.startsWith(monthKey) && getBonusInfo(day).earned) bonusCount++;
+            });
+            const offsetPoints = bonusCount * 2;
+            const netPoints = Math.max(0, penaltyPoints - offsetPoints);
+            const saving = getPenaltySavingAmount(netPoints);
+            return { monthKey, penaltyPoints, bonusCount, offsetPoints, netPoints, saving };
         }
 
         function loadLocalData() {
@@ -696,6 +947,7 @@
         function ensureDateDataExists(dateStr) {
             D.checkinData[dateStr] = normalizeCheckinRecord(D.checkinData[dateStr]);
             if (!D.phoneResistData.records[dateStr]) D.phoneResistData.records[dateStr] = { count: 0, history: [] };
+            ensurePenaltyDateExists(dateStr);
             if (!D.taskData[dateStr]) D.taskData[dateStr] = [];
             if (!D.timeBlocks[dateStr]) D.timeBlocks[dateStr] = [];
             if (!D.sleepData[dateStr]) D.sleepData[dateStr] = { wake: null, wakeOk: false, sleep: null, sleepOk: false };
@@ -707,12 +959,19 @@
         function updateSidebar() {
             const t = getTodayStr(); ensureDateDataExists(t);
             const work = D.checkinData[t].work;
+            const bonusInfo = getBonusInfo(t);
             const workInEl = document.getElementById('sb-work-in');
             const workOutEl = document.getElementById('sb-work-out');
+            const bonusTodayEl = document.getElementById('sb-bonus-today');
+            const bonusTotalEl = document.getElementById('sb-bonus-total');
             workInEl.textContent = work.checkIn || '未打卡';
             workInEl.className = work.checkIn ? (work.status.checkIn ? 'text-success' : 'text-danger') : 'text-gray-300';
             workOutEl.textContent = work.checkOut || '未打卡';
             workOutEl.className = work.checkOut ? (work.status.checkOut ? 'text-success' : 'text-danger') : 'text-gray-300';
+            bonusTodayEl.textContent = bonusInfo.label;
+            bonusTodayEl.className = bonusInfo.earned ? 'text-warning' : (bonusInfo.holiday.bonusEligible ? 'text-primary' : 'text-gray-300');
+            bonusTotalEl.textContent = `${getTotalBonusCount()}`;
+            bonusTotalEl.className = getTotalBonusCount() > 0 ? 'text-warning' : 'text-gray-300';
             document.getElementById('sb-phone').textContent = `${D.phoneResistData.records[t].count} 次`;
             
             const sbTask = document.getElementById('sb-task');
@@ -729,9 +988,14 @@
 
         async function initData() {
             loadLocalData();
+            loadHolidayCache();
             ensureDateDataExists(getTodayStr());
             renderSyncSettings();
             writeLocalData(false);
+            ensureHolidayYearLoaded(new Date().getFullYear()).then(() => {
+                if(typeof updateSidebar === 'function') updateSidebar();
+                if(typeof renderCheckinCalendar === 'function') renderCheckinCalendar();
+            });
             if (isCloudConfigured()) {
                 try {
                     await pullRemoteData({ silent: true });
@@ -765,7 +1029,7 @@
                     if(sec === 'hourly') renderTimeBlocksCalendar(document.getElementById('block-date-picker').value || getTodayStr());
                     if(sec === 'stats') { document.querySelector('.stats-period-btn.bg-white').click(); }
                     if(sec === 'checkin') updateCheckinUI();
-                    if(sec === 'phone') renderPhoneHistory();
+                    if(sec === 'phone') { renderPhoneHistory(); renderPenaltySummary(); }
                     if(sec === 'habits') renderHabitsForDate(getTodayStr());
                     if(sec === 'journal') document.getElementById('journal-date-picker').dispatchEvent(new Event('change'));
                     if(sec === 'tasks') { renderTodos(); renderTodayTasksTimeline(); }
@@ -802,6 +1066,7 @@
             const t = getTodayStr(); ensureDateDataExists(t);
             const sd = D.sleepData[t];
             const wd = D.checkinData[t].work;
+            const bonusInfo = getBonusInfo(t);
             const wb = document.getElementById('btn-wake'), sb = document.getElementById('btn-sleep');
             if(sd.wake){ document.getElementById('wake-time-display').textContent=`已打卡: ${sd.wake}`; wb.disabled=true; wb.classList.add('opacity-50'); } else { document.getElementById('wake-time-display').textContent=`-`; wb.disabled=false; wb.classList.remove('opacity-50'); }
             if(sd.sleep){ document.getElementById('sleep-time-display').textContent=`已打卡: ${sd.sleep}`; sb.disabled=true; sb.classList.add('opacity-50'); } else { document.getElementById('sleep-time-display').textContent=`-`; sb.disabled=false; sb.classList.remove('opacity-50'); }
@@ -813,11 +1078,18 @@
             outB.classList.toggle('opacity-50', outB.disabled);
             document.getElementById('td-work-in').textContent = wd.checkIn || '-';
             document.getElementById('td-work-out').textContent = wd.checkOut || '-';
+            document.getElementById('td-work-bonus').textContent = bonusInfo.label;
             renderCheckinCalendar();
         }
 
         function renderCheckinCalendar() {
             const y = currentCalDate.getFullYear(), m = currentCalDate.getMonth();
+            const yearKey = String(y);
+            if (!holidayCache[yearKey] && !HOLIDAY_FALLBACK[yearKey]) {
+                ensureHolidayYearLoaded(yearKey).then(() => {
+                    if (currentCalDate.getFullYear() === y && currentCalDate.getMonth() === m) renderCheckinCalendar();
+                });
+            }
             document.getElementById('cal-month-year').textContent = `${y}年${m+1}月`;
             const firstDay = new Date(y, m, 1).getDay(), daysInM = new Date(y, m+1, 0).getDate();
             const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
@@ -825,12 +1097,19 @@
             for(let i=1; i<=daysInM; i++) {
                 const dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 const sd = D.sleepData[dStr] || {}, cd = normalizeCheckinRecord(D.checkinData[dStr]);
+                const holiday = getHolidayStatus(dStr);
+                const bonusInfo = getBonusInfo(dStr);
                 let dots = '';
+                if(holiday.kind === 'holiday') dots += '<span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>';
+                else if(holiday.kind === 'weekend') dots += '<span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>';
+                else if(holiday.kind === 'makeup') dots += '<span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>';
                 if(sd.wakeOk) dots += '<span class="w-1.5 h-1.5 bg-warning rounded-full"></span>';
                 if(sd.sleepOk) dots += '<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span>';
                 if(cd?.work?.status?.checkIn && cd?.work?.status?.checkOut) dots += '<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>';
                 else if(cd?.work?.checkIn || cd?.work?.checkOut) dots += '<span class="w-1.5 h-1.5 bg-danger rounded-full"></span>';
-                grid.innerHTML += `<div class="py-1 flex flex-col items-center justify-center rounded-lg ${dStr===getTodayStr()?'bg-blue-50':''}"><span class="text-xs font-bold mb-0.5">${i}</span><div class="flex gap-0.5 h-1.5">${dots}</div></div>`;
+                if(bonusInfo.earned) dots += '<span class="w-1.5 h-1.5 bg-warning rounded-full"></span>';
+                const textTone = holiday.kind === 'holiday' ? 'text-red-600' : (holiday.kind === 'makeup' ? 'text-amber-600' : 'text-textmain');
+                grid.innerHTML += `<div class="py-1 flex flex-col items-center justify-center rounded-lg ${dStr===getTodayStr()?'bg-blue-50':''}" title="${holiday.label}${bonusInfo.earned ? ' ｜ 已获得 Bonus +1' : ''}"><span class="text-xs font-bold mb-0.5 ${textTone}">${i}</span><div class="text-[10px] h-3 leading-3 ${textTone}">${holiday.shortLabel}</div><div class="flex gap-0.5 h-1.5 mt-0.5">${dots}</div></div>`;
             }
         }
 
@@ -1134,13 +1413,60 @@
         }
 
         function initPhone() {
-            const h = s => { const r=document.getElementById('phone-reason-input').value; if(r){ const t=getTodayStr(); if(s){ D.phoneResistData.totalCount++; D.phoneResistData.records[t].count++; } D.phoneResistData.records[t].history.unshift({time:getTimeStr(), reason:r, success:s}); saveData(); document.getElementById('phone-reason-input').value=''; renderPhoneHistory(); }};
+            const h = s => {
+                const r = document.getElementById('phone-reason-input').value;
+                if(r){
+                    const t = getTodayStr();
+                    if(s){
+                        D.phoneResistData.totalCount++;
+                        D.phoneResistData.records[t].count++;
+                    } else {
+                        addPenaltyRecord({ dateStr: t, points: 1, reason: `没忍住：${r}`, source: 'phone-fail' });
+                    }
+                    D.phoneResistData.records[t].history.unshift({time:getTimeStr(), reason:r, success:s});
+                    saveData();
+                    document.getElementById('phone-reason-input').value='';
+                    renderPhoneHistory();
+                    renderPenaltySummary();
+                }
+            };
             document.getElementById('btn-resist-success').onclick = () => h(true); document.getElementById('btn-resist-fail').onclick = () => h(false);
+            document.getElementById('btn-add-penalty').onclick = () => {
+                const reasonInput = document.getElementById('penalty-reason-input');
+                const pointsSelect = document.getElementById('penalty-points-select');
+                const reason = reasonInput.value.trim();
+                if (!reason) return alert('请填写惩罚原因');
+                addPenaltyRecord({ points: Number(pointsSelect.value), reason, source: 'manual' });
+                reasonInput.value = '';
+                saveData();
+                renderPenaltySummary();
+            };
         }
 
         function renderPhoneHistory() {
             document.getElementById('phone-resist-count').textContent=D.phoneResistData.totalCount;
             const c=document.getElementById('phone-history-list'); c.innerHTML=''; (D.phoneResistData.records[getTodayStr()].history||[]).forEach(i=>{ c.innerHTML+=`<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${i.time}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${i.reason}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right">${i.success?'<span class="bg-success/20 text-green-700 px-2 py-1 rounded font-bold text-xs">成功</span>':'<span class="bg-danger/20 text-red-700 px-2 py-1 rounded font-bold text-xs">失败</span>'}</td></tr>` });
+        }
+
+        function renderPenaltySummary() {
+            const settlement = getMonthlySettlement();
+            document.getElementById('penalty-month-total').textContent = settlement.penaltyPoints;
+            document.getElementById('bonus-month-total').textContent = settlement.bonusCount;
+            document.getElementById('penalty-month-net').textContent = settlement.netPoints;
+            document.getElementById('penalty-month-saving').textContent = `${settlement.saving} 元`;
+            document.getElementById('stats-penalty-total').textContent = settlement.penaltyPoints;
+            document.getElementById('stats-bonus-total').textContent = settlement.bonusCount;
+            document.getElementById('stats-penalty-net').textContent = settlement.netPoints;
+            document.getElementById('stats-penalty-saving').textContent = `${settlement.saving} 元`;
+
+            const list = document.getElementById('penalty-history-list');
+            list.innerHTML = '';
+            (D.penaltyData.records[getTodayStr()] || []).forEach(item => {
+                list.innerHTML += `<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${item.time}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${item.reason}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right"><span class="bg-danger/10 text-danger px-2 py-1 rounded font-bold text-xs">-${item.points}</span></td></tr>`;
+            });
+            if (!list.innerHTML) {
+                list.innerHTML = '<tr><td colspan="3" class="px-4 sm:px-6 py-4 text-center text-gray-400 text-sm">今天还没有惩罚记录</td></tr>';
+            }
         }
 
         function checkAchievements() { document.getElementById('unlocked-count').textContent=D.unlockedAchievements.length; document.getElementById('total-achievements-count').textContent=ACHIEVEMENTS_DB.length; }
@@ -1170,6 +1496,10 @@
 
         function renderCharts(days) { 
             if(typeof Chart === 'undefined') return;
+            const rateCanvas = document.getElementById('chart-checkin-rate');
+            const sleepCanvas = document.getElementById('chart-sleep-stats');
+            const durationCanvas = document.getElementById('chart-task-duration');
+            const phoneCanvas = document.getElementById('chart-phone-trend');
             const labels = [], rateData = [], durationData = [], phoneData = [];
             let wakeOk=0, wakeFail=0, sleepOk=0, sleepFail=0;
             const tickLimit = days > 30 ? (days > 180 ? 12 : 15) : 30;
@@ -1194,17 +1524,25 @@
             const xAxesOpt = { ticks: { maxTicksLimit: tickLimit, maxRotation: 0 } };
             const chartOpt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
-            if(charts.rate) charts.rate.destroy(); 
-            charts.rate = new Chart(document.getElementById('chart-checkin-rate').getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: rateData, borderColor: '#9fbcdb', backgroundColor: 'rgba(159, 188, 219, 0.1)', fill: true, tension: 0.3 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true, max: 100 } } } });
+            if(charts.rate) { charts.rate.destroy(); charts.rate = null; }
+            if(rateCanvas) {
+                charts.rate = new Chart(rateCanvas.getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: rateData, borderColor: '#9fbcdb', backgroundColor: 'rgba(159, 188, 219, 0.1)', fill: true, tension: 0.3 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true, max: 100 } } } });
+            }
             
-            if(charts.sleep) charts.sleep.destroy(); 
-            charts.sleep = new Chart(document.getElementById('chart-sleep-stats').getContext('2d'), { type: 'bar', data: { labels: ['起床', '睡觉'], datasets: [{ label: '达标', data: [wakeOk, sleepOk], backgroundColor: '#a6cbb5', borderRadius: 4 }, { label: '未达标', data: [wakeFail, sleepFail], backgroundColor: '#e0a2a2', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } } });
+            if(charts.sleep) { charts.sleep.destroy(); charts.sleep = null; }
+            if(sleepCanvas) {
+                charts.sleep = new Chart(sleepCanvas.getContext('2d'), { type: 'bar', data: { labels: ['起床', '睡觉'], datasets: [{ label: '达标', data: [wakeOk, sleepOk], backgroundColor: '#a6cbb5', borderRadius: 4 }, { label: '未达标', data: [wakeFail, sleepFail], backgroundColor: '#e0a2a2', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } } });
+            }
             
-            if(charts.duration) charts.duration.destroy(); 
-            charts.duration = new Chart(document.getElementById('chart-task-duration').getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: durationData, borderColor: '#bbaecc', backgroundColor: 'rgba(187, 174, 204, 0.2)', fill: true, tension: 0.4 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true } } } });
+            if(charts.duration) { charts.duration.destroy(); charts.duration = null; }
+            if(durationCanvas) {
+                charts.duration = new Chart(durationCanvas.getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: durationData, borderColor: '#bbaecc', backgroundColor: 'rgba(187, 174, 204, 0.2)', fill: true, tension: 0.4 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true } } } });
+            }
             
-            if(charts.phone) charts.phone.destroy(); 
-            charts.phone = new Chart(document.getElementById('chart-phone-trend').getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: phoneData, borderColor: '#e0a2a2', backgroundColor: 'rgba(224, 162, 162, 0.1)', fill: true, tension: 0.4 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true } } } });
+            if(charts.phone) { charts.phone.destroy(); charts.phone = null; }
+            if(phoneCanvas) {
+                charts.phone = new Chart(phoneCanvas.getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: phoneData, borderColor: '#e0a2a2', backgroundColor: 'rgba(224, 162, 162, 0.1)', fill: true, tension: 0.4 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true } } } });
+            }
         }
 
         // 启动挂载
@@ -1212,7 +1550,7 @@
             initSync();
             await initData();
             initNavigation(); initCheckin(); initTimeBlocksCalendar(); initTasks(); initPhone(); initHabits(); initJournal(); initStats();
-            updateSidebar(); checkAchievements(); renderSyncMeta();
+            updateSidebar(); checkAchievements(); renderSyncMeta(); renderPenaltySummary();
             setInterval(() => { document.getElementById('current-date-time').textContent = new Date().toLocaleString(); }, 1000);
         });
     </script>
