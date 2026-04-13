@@ -57,6 +57,30 @@
         .focus-leave-pill { background: linear-gradient(135deg, rgba(224,162,162,0.16), rgba(238,203,168,0.22)); }
         .focus-leave-danger { background: linear-gradient(135deg, #d88f8f, #cf7777); }
         .focus-leave-safe { background: linear-gradient(135deg, #b8accb, #9fbcdb); }
+        body.focus-manual-landscape {
+            overflow: hidden;
+            background: linear-gradient(135deg, #f4f2f8, #eef2f8);
+        }
+        body.focus-manual-landscape #current-task-container {
+            position: fixed !important;
+            top: 50%;
+            left: 50%;
+            z-index: 70;
+            width: 100dvh;
+            height: 100dvw;
+            max-width: none;
+            max-height: none;
+            margin: 0;
+            overflow: auto;
+            border-radius: 0;
+            transform: translate(-50%, -50%) rotate(90deg);
+            transform-origin: center center;
+            padding: 1.25rem;
+        }
+        body.focus-manual-landscape #current-task-container > div {
+            min-height: calc(100dvw - 2.5rem);
+            justify-content: center;
+        }
         @keyframes focusReminderIn {
             0% { transform: translateY(20px) scale(0.96); opacity: 0; }
             100% { transform: translateY(0) scale(1); opacity: 1; }
@@ -754,6 +778,7 @@
         let currentTask = null; let taskTimer = null; 
         let focusReminderVisible = false;
         const focusLeaveState = { pending: false, reason: '', visible: false };
+        const focusUiState = { manualLandscape: false };
         let charts = { rate: null, period: null, duration: null, phone: null, sleep: null, habit: null, mixed: null };
         let currentCalDate = new Date();
         let statsOverviewDate = new Date();
@@ -1267,6 +1292,20 @@
             btn.classList.toggle('hidden', !visible);
         }
 
+        function updateFocusLandscapeButtonLabel() {
+            const btn = document.getElementById('focus-landscape-btn');
+            if (!btn) return;
+            btn.innerHTML = focusUiState.manualLandscape
+                ? '<i class="fa fa-compress mr-2"></i>退出横屏'
+                : '<i class="fa fa-rotate-right mr-2"></i>横屏显示';
+        }
+
+        function setManualFocusLandscapeMode(enabled) {
+            focusUiState.manualLandscape = enabled;
+            document.body.classList.toggle('focus-manual-landscape', enabled);
+            updateFocusLandscapeButtonLabel();
+        }
+
         async function activateMobileFocusMode(taskName) {
             focusGuard.active = true;
             focusGuard.immersive = true;
@@ -1276,7 +1315,8 @@
             const box = document.getElementById('current-task-container');
             box.classList.add('fixed', 'inset-3', 'z-40', 'overflow-auto');
             setMobileFocusHint(true);
-            await tryLockFocusLandscape();
+            const locked = await tryLockFocusLandscape();
+            if (!locked) setManualFocusLandscapeMode(true);
         }
 
         async function deactivateMobileFocusMode() {
@@ -1287,6 +1327,7 @@
             const box = document.getElementById('current-task-container');
             box.classList.remove('fixed', 'inset-3', 'z-40', 'overflow-auto');
             setMobileFocusHint(false);
+            setManualFocusLandscapeMode(false);
             await unlockFocusOrientation();
             await exitFocusFullscreen();
         }
@@ -1362,6 +1403,7 @@
             focusLeaveState.reason = '';
             document.getElementById('current-task-container').classList.add('hidden');
             setFocusLandscapeButtonVisible(false);
+            setManualFocusLandscapeMode(false);
             deactivateMobileFocusMode();
             saveData();
             updateFocusReliefDisplay();
@@ -1912,9 +1954,14 @@
             const landscapeBtn = document.getElementById('focus-landscape-btn');
             if (landscapeBtn) {
                 landscapeBtn.onclick = async () => {
+                    if (focusUiState.manualLandscape) {
+                        setManualFocusLandscapeMode(false);
+                        return;
+                    }
                     const locked = await tryLockFocusLandscape();
-                    if (!locked) alert('当前浏览器暂不支持自动锁定横屏。你可以先点全屏，再手动把手机横过来。');
+                    if (!locked) setManualFocusLandscapeMode(true);
                 };
+                updateFocusLandscapeButtonLabel();
             }
         }
 
@@ -1969,6 +2016,7 @@
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
             document.getElementById('current-real-time').textContent = getTimeStr();
+            setManualFocusLandscapeMode(false);
             setFocusLandscapeButtonVisible(true);
             updateFocusReliefDisplay();
             hideFocusReminder();
