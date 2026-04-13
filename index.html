@@ -576,6 +576,29 @@
                             <p class="text-xs text-gray-500 font-bold mt-3">规则：1 个 Bonus 可抵消 2 个惩罚点；月底按净惩罚点结算。</p>
                         </div>
                     </div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm mb-4 sm:mb-6">
+                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-sm sm:text-base font-black text-textmain">Bonus / 惩罚点趋势</h3>
+                                <p class="text-xs text-gray-500 font-medium mt-1">在一张图里看每天的 Bonus、惩罚点和净惩罚点变化。</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2" id="stats-mixed-line-toggles">
+                                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-warning/10 text-warning font-bold text-xs sm:text-sm cursor-pointer">
+                                    <input type="checkbox" class="stats-line-toggle accent-[var(--warning)]" data-line="bonus" checked>
+                                    <span>Bonus</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-danger/10 text-danger font-bold text-xs sm:text-sm cursor-pointer">
+                                    <input type="checkbox" class="stats-line-toggle accent-[var(--danger)]" data-line="penalty" checked>
+                                    <span>惩罚点</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-textmain font-bold text-xs sm:text-sm cursor-pointer">
+                                    <input type="checkbox" class="stats-line-toggle accent-gray-700" data-line="net" checked>
+                                    <span>净惩罚点</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="relative w-full h-[220px] sm:h-[260px]"><canvas id="chart-bonus-penalty-mix"></canvas></div>
+                    </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
                             <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">深度专注时长 (h)</h3>
@@ -584,6 +607,72 @@
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
                             <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">手机克制次数</h3>
                             <div class="relative w-full h-[180px] sm:h-[200px]"><canvas id="chart-phone-trend"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm mt-4 sm:mt-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-sm sm:text-base font-black text-textmain">Bonus / 惩罚日期总览</h3>
+                                <p class="text-xs text-gray-500 font-medium mt-1">在一张月历里查看哪些天有 Bonus、惩罚点，或两者同时出现。</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="stats-overview-prev" class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-50 text-textmuted hover:bg-gray-100 transition-colors"><i class="fa fa-chevron-left"></i></button>
+                                <div id="stats-overview-month" class="min-w-[120px] text-center text-sm sm:text-base font-black text-textmain"></div>
+                                <button id="stats-overview-next" class="w-10 h-10 rounded-xl border border-gray-200 bg-gray-50 text-textmuted hover:bg-gray-100 transition-colors"><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 mb-2">
+                            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                        </div>
+                        <div id="stats-date-overview-grid" class="grid grid-cols-7 gap-2"></div>
+                        <div class="flex flex-wrap gap-3 mt-4 text-xs font-bold text-gray-500">
+                            <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-warning"></span>仅 Bonus</span>
+                            <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-danger"></span>仅惩罚</span>
+                            <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-textmain"></span>Bonus + 惩罚</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+                        <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-black text-textmain">指定日期惩罚明细</h3>
+                                    <p class="text-xs text-gray-500 font-medium mt-1">可查看任意一天的惩罚记录与来源。</p>
+                                </div>
+                                <input type="date" id="stats-penalty-date-picker" class="w-full sm:w-auto bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-bold text-sm text-textmain outline-none">
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-xs sm:text-sm text-left">
+                                    <thead class="text-gray-500 bg-gray-50 uppercase font-bold">
+                                        <tr>
+                                            <th class="px-4 py-3 w-24 sm:w-32">时间</th>
+                                            <th class="px-4 py-3">惩罚原因</th>
+                                            <th class="px-4 py-3 w-24 text-right">惩罚点</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100" id="stats-penalty-history-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-black text-textmain">指定日期 Bonus 明细</h3>
+                                    <p class="text-xs text-gray-500 font-medium mt-1">可查看任意一天的节假日 Bonus 与专注奖励。</p>
+                                </div>
+                                <input type="date" id="stats-bonus-date-picker" class="w-full sm:w-auto bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-bold text-sm text-textmain outline-none">
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-xs sm:text-sm text-left">
+                                    <thead class="text-gray-500 bg-gray-50 uppercase font-bold">
+                                        <tr>
+                                            <th class="px-4 py-3 w-24 sm:w-32">时间</th>
+                                            <th class="px-4 py-3">Bonus 明细</th>
+                                            <th class="px-4 py-3 w-24 text-right">Bonus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100" id="stats-bonus-history-list"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -662,8 +751,9 @@
         let currentTask = null; let taskTimer = null; 
         let focusReminderVisible = false;
         const focusLeaveState = { pending: false, reason: '', visible: false };
-        let charts = { rate: null, period: null, duration: null, phone: null, sleep: null, habit: null };
+        let charts = { rate: null, period: null, duration: null, phone: null, sleep: null, habit: null, mixed: null };
         let currentCalDate = new Date();
+        let statsOverviewDate = new Date();
         const SYNC_SETTINGS_KEY = 'phdWorkspaceCloudSyncSettings';
         const SYNC_META_KEY = 'phdWorkspaceCloudSyncMeta';
         const HOLIDAY_CACHE_KEY = 'phdWorkspaceHolidayCache';
@@ -916,7 +1006,9 @@
             const holiday = getHolidayStatus(dateStr);
             const worked = !!record?.work?.checkIn;
             const holidayBonus = worked && holiday.bonusEligible ? 1 : 0;
-            const focusBonus = (D.bonusData?.records?.[dateStr] || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const recordedFocusBonus = (D.bonusData?.records?.[dateStr] || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const derivedFocusBonus = getDerivedFocusBonusRecords(dateStr).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const focusBonus = recordedFocusBonus + derivedFocusBonus;
             const total = holidayBonus + focusBonus;
             let label = '-';
             if (total > 0) label = `+${total} Bonus`;
@@ -1016,6 +1108,21 @@
             });
         }
 
+        function getDerivedFocusBonusRecords(dateStr = getTodayStr()) {
+            const tasks = (D.taskData?.[dateStr] || []).filter(item => (Number(item?.duration) || 0) >= 45);
+            if (!tasks.length) return [];
+            const existingFocusBonusCount = (D.bonusData?.records?.[dateStr] || []).filter(item => item?.source === 'focus-complete').length;
+            if (existingFocusBonusCount >= tasks.length) return [];
+            return tasks
+                .slice(existingFocusBonusCount)
+                .map(task => ({
+                    time: task.endTime || task.startTime || '-',
+                    amount: 1,
+                    reason: `${task.name || '专注任务'} 专注满 ${Number(task.duration) || 45} 分钟`,
+                    source: 'focus-complete-derived'
+                }));
+        }
+
         function getBonusRecordsForDate(dateStr = getTodayStr()) {
             const items = [];
             const bonusInfo = getBonusInfo(dateStr);
@@ -1023,6 +1130,7 @@
                 items.push({ time: '全天', amount: bonusInfo.holidayBonus, reason: `${bonusInfo.holiday.label}上班加分`, source: 'holiday' });
             }
             (D.bonusData.records[dateStr] || []).forEach(item => items.push(item));
+            getDerivedFocusBonusRecords(dateStr).forEach(item => items.push(item));
             return items;
         }
 
@@ -2084,13 +2192,16 @@
                 list.innerHTML = '<tr><td colspan="3" class="px-4 sm:px-6 py-4 text-center text-gray-400 text-sm">今天还没有惩罚记录</td></tr>';
             }
 
+            const statsPenaltyDatePicker = document.getElementById('stats-penalty-date-picker');
+            if (statsPenaltyDatePicker) renderStatsPenaltyDetails(statsPenaltyDatePicker.value || getTodayStr());
+
             const bonusList = document.getElementById('bonus-history-list');
             if (bonusList) {
                 bonusList.innerHTML = '';
                 getBonusRecordsForDate(getTodayStr()).forEach(item => {
                     const sourceTag = item.source === 'holiday'
                         ? '<span class="ml-2 inline-flex whitespace-nowrap bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-[10px]">休息日</span>'
-                        : (item.source === 'focus-guard'
+                        : (String(item.source || '').startsWith('focus-')
                             ? '<span class="ml-2 inline-flex whitespace-nowrap bg-secondary/10 text-secondary px-2 py-0.5 rounded font-bold text-[10px]">专注</span>'
                             : '<span class="ml-2 inline-flex whitespace-nowrap bg-warning/10 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">奖励</span>');
                     bonusList.innerHTML += `<tr><td class="px-4 sm:px-6 py-2 sm:py-3">${item.time || '-'}</td><td class="px-4 sm:px-6 py-2 sm:py-3">${item.reason}${sourceTag}</td><td class="px-4 sm:px-6 py-2 sm:py-3 text-right"><span class="bg-warning/10 text-warning px-2 py-1 rounded font-bold text-xs">+${item.amount}</span></td></tr>`;
@@ -2098,6 +2209,100 @@
                 if (!bonusList.innerHTML) {
                     bonusList.innerHTML = '<tr><td colspan="3" class="px-4 sm:px-6 py-4 text-center text-gray-400 text-sm">今天还没有 Bonus 明细</td></tr>';
                 }
+            }
+
+            const statsDatePicker = document.getElementById('stats-bonus-date-picker');
+            if (statsDatePicker) renderStatsBonusDetails(statsDatePicker.value || getTodayStr());
+            renderStatsDateOverview();
+        }
+
+        function renderStatsPenaltyDetails(dateStr = getTodayStr()) {
+            const list = document.getElementById('stats-penalty-history-list');
+            if (!list) return;
+            ensureDateDataExists(dateStr);
+            list.innerHTML = '';
+            (D.penaltyData.records[dateStr] || []).forEach(item => {
+                const sourceTag = item.source?.startsWith('auto-')
+                    ? '<span class="ml-2 bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-bold text-[10px]">自动</span>'
+                    : (item.source === 'manual'
+                        ? '<span class="ml-2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">手动</span>'
+                        : '<span class="ml-2 bg-danger/10 text-danger px-2 py-0.5 rounded font-bold text-[10px]">约束</span>');
+                list.innerHTML += `<tr><td class="px-4 py-3">${item.time || '-'}</td><td class="px-4 py-3">${item.reason}${sourceTag}</td><td class="px-4 py-3 text-right"><span class="bg-danger/10 text-danger px-2 py-1 rounded font-bold text-xs">-${item.points}</span></td></tr>`;
+            });
+            if (!list.innerHTML) {
+                list.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-400 text-sm">这一天还没有惩罚记录</td></tr>';
+            }
+        }
+
+        function renderStatsDateOverview() {
+            const grid = document.getElementById('stats-date-overview-grid');
+            const monthEl = document.getElementById('stats-overview-month');
+            if (!grid || !monthEl) return;
+            const year = statsOverviewDate.getFullYear();
+            const month = statsOverviewDate.getMonth();
+            monthEl.textContent = `${year}年${month + 1}月`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const selectedDate = document.getElementById('stats-bonus-date-picker')?.value || document.getElementById('stats-penalty-date-picker')?.value || getTodayStr();
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += '<div class="h-12 sm:h-14 rounded-xl bg-gray-50/60 border border-transparent"></div>';
+            }
+
+            for (let day = 1; day <= lastDate; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const bonusCount = getBonusInfo(dateStr).total;
+                const penaltyCount = (D.penaltyData.records[dateStr] || []).reduce((sum, item) => sum + (Number(item.points) || 0), 0);
+                const isSelected = dateStr === selectedDate;
+                const hasBonus = bonusCount > 0;
+                const hasPenalty = penaltyCount > 0;
+                const toneClass = hasBonus && hasPenalty
+                    ? 'bg-gray-900 text-white border-gray-900'
+                    : hasBonus
+                        ? 'bg-warning/10 text-warning border-warning/30'
+                        : hasPenalty
+                            ? 'bg-danger/10 text-danger border-danger/30'
+                            : 'bg-white text-textmain border-gray-200';
+                const marker = hasBonus && hasPenalty
+                    ? '<span class="inline-flex gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white"></span><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span></span>'
+                    : hasBonus
+                        ? '<span class="w-2 h-2 rounded-full bg-warning inline-block"></span>'
+                        : hasPenalty
+                            ? '<span class="w-2 h-2 rounded-full bg-danger inline-block"></span>'
+                            : '<span class="w-2 h-2 inline-block"></span>';
+                grid.innerHTML += `<button type="button" class="h-12 sm:h-14 rounded-xl border text-xs sm:text-sm font-black flex flex-col items-center justify-center gap-1 transition-all ${toneClass} ${isSelected ? 'ring-2 ring-primary/40 scale-[1.02]' : 'hover:border-primary/30'}" data-stats-date="${dateStr}"><span>${day}</span>${marker}</button>`;
+            }
+
+            grid.querySelectorAll('[data-stats-date]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const dateStr = btn.getAttribute('data-stats-date');
+                    const penaltyPicker = document.getElementById('stats-penalty-date-picker');
+                    const bonusPicker = document.getElementById('stats-bonus-date-picker');
+                    if (penaltyPicker) penaltyPicker.value = dateStr;
+                    if (bonusPicker) bonusPicker.value = dateStr;
+                    renderStatsPenaltyDetails(dateStr);
+                    renderStatsBonusDetails(dateStr);
+                    renderStatsDateOverview();
+                });
+            });
+        }
+
+        function renderStatsBonusDetails(dateStr = getTodayStr()) {
+            const list = document.getElementById('stats-bonus-history-list');
+            if (!list) return;
+            ensureDateDataExists(dateStr);
+            list.innerHTML = '';
+            getBonusRecordsForDate(dateStr).forEach(item => {
+                const sourceTag = item.source === 'holiday'
+                    ? '<span class="ml-2 inline-flex whitespace-nowrap bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-[10px]">休息日</span>'
+                    : (String(item.source || '').startsWith('focus-')
+                        ? '<span class="ml-2 inline-flex whitespace-nowrap bg-secondary/10 text-secondary px-2 py-0.5 rounded font-bold text-[10px]">专注</span>'
+                        : '<span class="ml-2 inline-flex whitespace-nowrap bg-warning/10 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]">奖励</span>');
+                list.innerHTML += `<tr><td class="px-4 py-3">${item.time || '-'}</td><td class="px-4 py-3">${item.reason}${sourceTag}</td><td class="px-4 py-3 text-right"><span class="bg-warning/10 text-warning px-2 py-1 rounded font-bold text-xs">+${item.amount}</span></td></tr>`;
+            });
+            if (!list.innerHTML) {
+                list.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-400 text-sm">这一天还没有 Bonus 明细</td></tr>';
             }
         }
 
@@ -2113,6 +2318,46 @@
         }
 
         function initStats() {
+            document.querySelectorAll('.stats-line-toggle').forEach(toggle => {
+                toggle.addEventListener('change', () => {
+                    const activeBtn = document.querySelector('.stats-period-btn.bg-white');
+                    renderCharts(parseInt(activeBtn?.getAttribute('data-period') || '7', 10));
+                });
+            });
+            const prevBtn = document.getElementById('stats-overview-prev');
+            const nextBtn = document.getElementById('stats-overview-next');
+            if (prevBtn) prevBtn.addEventListener('click', () => {
+                statsOverviewDate.setMonth(statsOverviewDate.getMonth() - 1);
+                renderStatsDateOverview();
+            });
+            if (nextBtn) nextBtn.addEventListener('click', () => {
+                statsOverviewDate.setMonth(statsOverviewDate.getMonth() + 1);
+                renderStatsDateOverview();
+            });
+            const penaltyDatePicker = document.getElementById('stats-penalty-date-picker');
+            if (penaltyDatePicker) {
+                penaltyDatePicker.value = getTodayStr();
+                penaltyDatePicker.addEventListener('change', e => {
+                    const selected = new Date(`${e.target.value}T00:00:00`);
+                    if (!Number.isNaN(selected.getTime())) statsOverviewDate = selected;
+                    renderStatsPenaltyDetails(e.target.value);
+                    renderStatsDateOverview();
+                });
+                renderStatsPenaltyDetails(penaltyDatePicker.value);
+            }
+            const datePicker = document.getElementById('stats-bonus-date-picker');
+            if (datePicker) {
+                datePicker.value = getTodayStr();
+                datePicker.addEventListener('change', e => {
+                    const selected = new Date(`${e.target.value}T00:00:00`);
+                    if (!Number.isNaN(selected.getTime())) statsOverviewDate = selected;
+                    renderStatsBonusDetails(e.target.value);
+                    renderStatsDateOverview();
+                });
+                renderStatsBonusDetails(datePicker.value);
+            }
+            statsOverviewDate = new Date(`${getTodayStr()}T00:00:00`);
+            renderStatsDateOverview();
             document.querySelectorAll('.stats-period-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.stats-period-btn').forEach(b => {
@@ -2132,7 +2377,8 @@
             const sleepCanvas = document.getElementById('chart-sleep-stats');
             const durationCanvas = document.getElementById('chart-task-duration');
             const phoneCanvas = document.getElementById('chart-phone-trend');
-            const labels = [], rateData = [], durationData = [], phoneData = [];
+            const mixedCanvas = document.getElementById('chart-bonus-penalty-mix');
+            const labels = [], rateData = [], durationData = [], phoneData = [], dailyBonusData = [], dailyPenaltyData = [], dailyNetPenaltyData = [];
             let wakeOk=0, wakeFail=0, sleepOk=0, sleepFail=0;
             const tickLimit = days > 30 ? (days > 180 ? 12 : 15) : 30;
 
@@ -2151,6 +2397,11 @@
 
                 let focusM = 0; (D.taskData[d] || []).forEach(t => focusM += t.duration); durationData.push((focusM/60).toFixed(1));
                 phoneData.push(D.phoneResistData.records[d] ? D.phoneResistData.records[d].count : 0);
+                const dailyBonus = getBonusInfo(d).total;
+                const dailyPenalty = (D.penaltyData.records[d] || []).reduce((sum, item) => sum + (Number(item.points) || 0), 0);
+                dailyBonusData.push(dailyBonus);
+                dailyPenaltyData.push(dailyPenalty);
+                dailyNetPenaltyData.push(Math.max(0, dailyPenalty - dailyBonus * 2));
             }
 
             const xAxesOpt = { ticks: { maxTicksLimit: tickLimit, maxRotation: 0 } };
@@ -2174,6 +2425,70 @@
             if(charts.phone) { charts.phone.destroy(); charts.phone = null; }
             if(phoneCanvas) {
                 charts.phone = new Chart(phoneCanvas.getContext('2d'), { type: 'line', data: { labels, datasets: [{ data: phoneData, borderColor: '#e0a2a2', backgroundColor: 'rgba(224, 162, 162, 0.1)', fill: true, tension: 0.4 }] }, options: { ...chartOpt, scales: { x: xAxesOpt, y: { beginAtZero: true } } } });
+            }
+
+            const showBonus = document.querySelector('.stats-line-toggle[data-line="bonus"]')?.checked ?? true;
+            const showPenalty = document.querySelector('.stats-line-toggle[data-line="penalty"]')?.checked ?? true;
+            const showNet = document.querySelector('.stats-line-toggle[data-line="net"]')?.checked ?? true;
+            const mixedDatasets = [];
+            if (showBonus) {
+                mixedDatasets.push({
+                    label: 'Bonus',
+                    data: dailyBonusData,
+                    borderColor: '#e8c978',
+                    backgroundColor: 'rgba(232, 201, 120, 0.14)',
+                    fill: false,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 3
+                });
+            }
+            if (showPenalty) {
+                mixedDatasets.push({
+                    label: '惩罚点',
+                    data: dailyPenaltyData,
+                    borderColor: '#e0a2a2',
+                    backgroundColor: 'rgba(224, 162, 162, 0.14)',
+                    fill: false,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    order: 2
+                });
+            }
+            if (showNet) {
+                mixedDatasets.push({
+                    label: '净惩罚点',
+                    data: dailyNetPenaltyData,
+                    borderColor: '#636778',
+                    backgroundColor: 'rgba(99, 103, 120, 0.12)',
+                    fill: false,
+                    tension: 0.35,
+                    borderWidth: 4,
+                    borderDash: [8, 6],
+                    pointRadius: 5,
+                    pointHoverRadius: 6,
+                    pointStyle: 'rectRot',
+                    pointBackgroundColor: '#636778',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    order: 1
+                });
+            }
+
+            if(charts.mixed) { charts.mixed.destroy(); charts.mixed = null; }
+            if(mixedCanvas) {
+                charts.mixed = new Chart(mixedCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: { labels, datasets: mixedDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: xAxesOpt, y: { beginAtZero: true } }
+                    }
+                });
             }
         }
 
