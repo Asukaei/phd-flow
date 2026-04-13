@@ -169,7 +169,7 @@
                     </div>
                     <div class="rounded-[1.35rem] bg-white/85 border border-warning/20 px-4 py-4 shadow-[0_12px_30px_-24px_rgba(214,167,96,0.75)]">
                         <div class="text-[11px] font-black uppercase tracking-[0.18em] text-textmuted mb-2">Mid Exit</div>
-                        <div class="text-sm font-bold text-textmuted mb-1">15-45 分钟</div>
+                        <div class="text-sm font-bold text-textmuted mb-1">15-30 分钟</div>
                         <div class="text-amber-700 font-black text-lg">确认离开扣 1 点</div>
                     </div>
                 </div>
@@ -1248,7 +1248,11 @@
             const modal = document.getElementById('focus-leave-modal');
             if (!modal) return;
             const elapsedMin = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
-            const outcome = elapsedMin < 15 ? '未满 15 分钟扣 2 点' : (elapsedMin < 45 ? '未满 45 分钟扣 1 点' : '已满足时长，按规则结算奖励');
+            const outcome = elapsedMin < 1
+                ? '不足 1 分钟不记录，也不扣分'
+                : (elapsedMin < 15
+                    ? '未满 15 分钟扣 2 点'
+                    : (elapsedMin < 30 ? '15-30 分钟扣 1 点' : (elapsedMin < 45 ? '30-45 分钟不扣分' : '已满足时长，按规则结算奖励')));
             document.getElementById('focus-leave-message').textContent = `检测到专注过程被中断，原因：${focusLeaveState.reason}。如果只是手机息屏后又亮屏，请继续专注；如果你确认离开，本次专注会立刻结束，并按 ${outcome} 处理。`;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1261,12 +1265,14 @@
             if (elapsedMin < 1) return;
             if (elapsedMin < 15) {
                 addPenaltyRecord({ points: 2, reason: `手机端专注 ${elapsedMin} 分钟确认离开：${reason}`, source: 'focus-guard' });
-            } else if (elapsedMin < 45) {
+            } else if (elapsedMin < 30) {
                 addPenaltyRecord({ points: 1, reason: `手机端专注 ${elapsedMin} 分钟确认离开：${reason}`, source: 'focus-guard' });
             } else if (!focusGuard.bonusGranted) {
-                focusGuard.bonusGranted = true;
-                currentTask.bonusGranted = true;
-                addBonusRecord({ amount: 1, reason: `手机端专注满 ${elapsedMin} 分钟后确认离开`, source: 'focus-guard' });
+                if (elapsedMin >= 45) {
+                    focusGuard.bonusGranted = true;
+                    currentTask.bonusGranted = true;
+                    addBonusRecord({ amount: 1, reason: `手机端专注满 ${elapsedMin} 分钟后确认离开`, source: 'focus-guard' });
+                }
             }
         }
 
@@ -2032,7 +2038,7 @@
             focusLeaveState.pending = false;
             focusLeaveState.reason = '';
             if (isProbablyMobileDevice()) {
-                const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 15 分钟内确认离开：扣 2 点\n- 15-45 分钟确认离开：扣 1 点\n- 满 45 分钟正常结束或确认离开：奖励 1 Bonus');
+                const enableGuard = confirm('检测到你正在手机端开启专注。是否开启“手机端专注约束模式”？\n\n规则：\n- 1 分钟内退出：不记录、不扣分\n- 1-15 分钟确认离开：扣 2 点\n- 15-30 分钟确认离开：扣 1 点\n- 30-45 分钟确认离开：不扣分\n- 满 45 分钟正常结束或确认离开：奖励 1 Bonus');
                 if (enableGuard) await activateMobileFocusMode(n);
                 else setMobileFocusHint(false);
             } else {
