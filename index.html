@@ -181,6 +181,37 @@
             </div>
         </div>
     </div>
+    <div id="focus-summary-modal" class="hidden fixed inset-0 z-[96] items-center justify-center p-4 sm:p-6">
+        <div class="focus-reminder-backdrop absolute inset-0"></div>
+        <div class="focus-reminder-card focus-reminder-show relative w-full max-w-2xl rounded-[2rem] border border-white/70 p-6 sm:p-7 overflow-hidden">
+            <div class="relative">
+                <div class="flex items-start justify-between gap-4 mb-5">
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-[0.25em] text-secondary/70">Focus Summary</p>
+                        <h3 class="text-xl sm:text-2xl font-black text-textmain">这轮专注记点什么</h3>
+                        <p id="focus-summary-meta" class="text-sm text-textmuted font-bold mt-2">任务名 · 45 分钟</p>
+                    </div>
+                    <button id="focus-summary-skip-top" class="w-9 h-9 rounded-full bg-white/80 border border-gray-200 text-gray-400 hover:text-textmain transition-colors">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                    <div class="rounded-2xl bg-white/80 border border-gray-200 p-4">
+                        <div class="text-xs font-black tracking-[0.18em] uppercase text-secondary/80 mb-3">完成了什么</div>
+                        <textarea id="focus-summary-completed" class="w-full min-h-[140px] resize-none bg-transparent text-sm leading-7 outline-none" placeholder="比如：改完引言、跑通一个实验、梳理了 3 篇文献..."></textarea>
+                    </div>
+                    <div class="rounded-2xl bg-white/80 border border-gray-200 p-4">
+                        <div class="text-xs font-black tracking-[0.18em] uppercase text-accent/90 mb-3">待办什么</div>
+                        <textarea id="focus-summary-pending" class="w-full min-h-[140px] resize-none bg-transparent text-sm leading-7 outline-none" placeholder="比如：明天继续补方法部分、核对引用、整理图表..."></textarea>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="focus-summary-skip" class="flex-1 bg-white/85 text-textmain border border-gray-200 font-black py-3 rounded-2xl">先不写</button>
+                    <button id="focus-summary-save" class="flex-1 bg-secondary text-white font-black py-3 rounded-2xl shadow-lg shadow-secondary/20">保存这次小结</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-[1200px]">
         
         <header class="mb-6 sm:mb-10 text-center">
@@ -383,12 +414,27 @@
                         <div class="lg:col-span-6 space-y-4 sm:space-y-6">
                             <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-200">
                                 <h3 class="text-base sm:text-lg font-bold text-textmain mb-3 sm:mb-4 flex items-center justify-between">
+                                    <span><i class="fa fa-sitemap text-primary mr-2"></i>长期规划</span>
+                                </h3>
+                                <div class="space-y-3 mb-4">
+                                    <input type="text" id="long-plan-title-input" placeholder="长期任务名，比如：完成论文初稿" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-primary">
+                                    <textarea id="long-plan-detail-input" placeholder="补充目标、阶段说明或拆解思路..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg font-medium text-sm outline-none focus:ring-2 focus:ring-primary min-h-[88px] resize-none"></textarea>
+                                    <button id="btn-add-long-plan" class="w-full bg-primary text-white px-4 py-2.5 rounded-lg font-bold shadow-sm transition-transform active:scale-95 text-sm">新增长期任务</button>
+                                </div>
+                                <div id="long-plan-list-container" class="space-y-3 max-h-[340px] overflow-y-auto pr-2"></div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-200">
+                                <h3 class="text-base sm:text-lg font-bold text-textmain mb-3 sm:mb-4 flex items-center justify-between">
                                     <span><i class="fa fa-list-ul text-secondary mr-2"></i>每日待办清单</span>
                                 </h3>
                                 <div class="flex gap-2 mb-4">
                                     <input type="text" id="new-todo-input" placeholder="输入待办事项，按回车添加..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-secondary">
                                     <button id="btn-add-todo" class="bg-secondary text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-transform active:scale-95 text-sm shrink-0">添加</button>
                                 </div>
+                                <select id="todo-plan-select" class="w-full mb-4 px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-secondary">
+                                    <option value="">不关联长期任务</option>
+                                </select>
                                 <div id="todo-list-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
                             </div>
                         </div>
@@ -725,6 +771,7 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         };
         const getTimeStr = () => { const d = new Date(); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+        const escapeHtml = str => String(str ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
         
         const U = {
             getTotalFocusMins: d => Object.values(d.taskData).flat().reduce((s,t)=>s+t.duration, 0),
@@ -733,10 +780,19 @@
             getWakeStreak: (d, h) => { const dates = Object.keys(d.sleepData).filter(k => { const w=d.sleepData[k].wake; if(!w)return false; return parseInt(w.split(':')[0]) < h; }).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; },
             getSleepStreak: d => { const dates = Object.keys(d.sleepData).filter(k => d.sleepData[k].sleepOk).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; },
             getHabitMaxStreak: d => { if(d.habitConfig.length===0) return 0; let maxS = 0; d.habitConfig.forEach(h => { const dates = Object.keys(d.habitRecords).filter(k => d.habitRecords[k][h.id]).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } if(streak > maxS) maxS = streak; }); return maxS; },
-            getJournalStreak: d => { const dates = Object.keys(d.journalData).filter(k => d.journalData[k].proud || d.journalData[k].change).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; }
+            getJournalStreak: d => { const dates = Object.keys(d.journalData).filter(k => d.journalData[k].proud || d.journalData[k].change).sort().reverse(); let streak=0; for(let i=0; i<dates.length; i++) { if(dates[i] === getTodayStr(-i) || dates[i] === getTodayStr(-i-1)) streak++; else break; } return streak; },
+            getLongPlanCount: d => d.longPlanData?.plans?.length || 0,
+            getLongPlanChildCount: d => (d.longPlanData?.plans || []).reduce((sum, plan) => sum + (plan.children?.length || 0), 0),
+            getCompletedLongPlanChildCount: d => (d.longPlanData?.plans || []).reduce((sum, plan) => sum + (plan.children || []).filter(child => child.done).length, 0),
+            getLinkedTodoCount: d => Object.values(d.todoData || {}).flat().filter(todo => !!todo.planId).length,
+            getCompletedTodoCount: d => Object.values(d.todoData || {}).flat().filter(todo => !!todo.done).length,
+            getFullTodoDays: d => Object.keys(d.todoData || {}).filter(dateStr => {
+                const todos = d.todoData[dateStr] || [];
+                return todos.length > 0 && todos.every(todo => todo.done);
+            }).length
         };
 
-        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData', 'focusReliefData'];
+        const DATA_KEYS = ['checkinData', 'phoneResistData', 'penaltyData', 'bonusData', 'taskData', 'journalData', 'timeBlocks', 'habitConfig', 'habitRecords', 'unlockedAchievements', 'sleepData', 'todoData', 'focusReliefData', 'longPlanData'];
         let D = {};
         const CAT_MAP = {
             study: { label: '学习', color: 'primary' },
@@ -772,13 +828,21 @@
             { id: 'journal_7', cat: 'habit', name: '稳定复盘', desc: '连续 7 天写复盘', icon: 'fa-book', color: 'success', condition: d => U.getJournalStreak(d) >= 7 },
             { id: 'habit_7', cat: 'habit', name: '习惯萌芽', desc: '任意习惯连续 7 天', icon: 'fa-seedling', color: 'success', condition: d => U.getHabitMaxStreak(d) >= 7 },
             { id: 'habit_30', cat: 'habit', name: '习惯成型', desc: '任意习惯连续 30 天', icon: 'fa-leaf', color: 'success', condition: d => U.getHabitMaxStreak(d) >= 30 },
-            { id: 'habit_100', cat: 'habit', name: '滴水穿石', desc: '任意习惯连续 100 天', icon: 'fa-tint', color: 'success', condition: d => U.getHabitMaxStreak(d) >= 100 }
+            { id: 'habit_100', cat: 'habit', name: '滴水穿石', desc: '任意习惯连续 100 天', icon: 'fa-tint', color: 'success', condition: d => U.getHabitMaxStreak(d) >= 100 },
+            { id: 'plan_1', cat: 'habit', name: '立项者', desc: '创建第 1 个长期任务', icon: 'fa-map-signs', color: 'primary', condition: d => U.getLongPlanCount(d) >= 1 },
+            { id: 'plan_3', cat: 'habit', name: '规划成形', desc: '累计创建 3 个长期任务', icon: 'fa-sitemap', color: 'primary', condition: d => U.getLongPlanCount(d) >= 3 },
+            { id: 'plan_break_5', cat: 'habit', name: '会拆解的人', desc: '长期任务累计拆解出 5 个子任务', icon: 'fa-object-ungroup', color: 'primary', condition: d => U.getLongPlanChildCount(d) >= 5 },
+            { id: 'plan_done_3', cat: 'habit', name: '推进者', desc: '累计完成 3 个长期子任务', icon: 'fa-flag-checkered', color: 'success', condition: d => U.getCompletedLongPlanChildCount(d) >= 3 },
+            { id: 'todo_link_5', cat: 'habit', name: '日拱一卒', desc: '累计有 5 个每日待办关联到长期任务', icon: 'fa-link', color: 'secondary', condition: d => U.getLinkedTodoCount(d) >= 5 },
+            { id: 'todo_done_20', cat: 'habit', name: '执行堆栈', desc: '累计完成 20 个每日待办', icon: 'fa-check-circle', color: 'success', condition: d => U.getCompletedTodoCount(d) >= 20 },
+            { id: 'todo_full_3', cat: 'habit', name: '清单清空术', desc: '有 3 天把当天待办全部完成', icon: 'fa-magic', color: 'warning', condition: d => U.getFullTodoDays(d) >= 3 }
         ];
 
         let currentTask = null; let taskTimer = null; 
         let focusReminderVisible = false;
         const focusLeaveState = { pending: false, reason: '', visible: false };
         const focusUiState = { manualLandscape: false };
+        const focusSummaryState = { visible: false, taskSnapshot: null, afterFinish: null };
         let charts = { rate: null, period: null, duration: null, phone: null, sleep: null, habit: null, mixed: null };
         let currentCalDate = new Date();
         let statsOverviewDate = new Date();
@@ -847,6 +911,7 @@
             if (key === 'penaltyData') return { records: {} };
             if (key === 'bonusData') return { records: {} };
             if (key === 'focusReliefData') return { records: {} };
+            if (key === 'longPlanData') return { plans: [] };
             if (key === 'habitConfig' || key === 'unlockedAchievements') return [];
             return {};
         }
@@ -887,6 +952,7 @@
             normalized.focusReliefData.records = (normalized.focusReliefData.records && typeof normalized.focusReliefData.records === 'object' && !Array.isArray(normalized.focusReliefData.records))
                 ? normalized.focusReliefData.records
                 : {};
+            normalized.longPlanData.plans = Array.isArray(normalized.longPlanData?.plans) ? normalized.longPlanData.plans : [];
 
             ['checkinData', 'taskData', 'journalData', 'timeBlocks', 'habitRecords', 'sleepData', 'todoData'].forEach(key => {
                 normalized[key] = (normalized[key] && typeof normalized[key] === 'object' && !Array.isArray(normalized[key]))
@@ -929,6 +995,39 @@
                 Object.keys(normalized[key]).forEach(dateStr => {
                     if (!Array.isArray(normalized[key][dateStr])) normalized[key][dateStr] = [];
                 });
+            });
+
+            Object.keys(normalized.taskData).forEach(dateStr => {
+                normalized.taskData[dateStr] = normalized.taskData[dateStr].map(item => ({
+                    id: item?.id || `t_${Date.now()}`,
+                    name: item?.name || '专注任务',
+                    startTime: item?.startTime || '--:--',
+                    endTime: item?.endTime || '--:--',
+                    duration: Number(item?.duration) || 0,
+                    completedSummary: typeof item?.completedSummary === 'string' ? item.completedSummary : '',
+                    pendingSummary: typeof item?.pendingSummary === 'string' ? item.pendingSummary : ''
+                }));
+            });
+
+            normalized.longPlanData.plans = normalized.longPlanData.plans.map(plan => ({
+                id: plan?.id || `lp_${Date.now()}`,
+                title: typeof plan?.title === 'string' ? plan.title : '长期任务',
+                detail: typeof plan?.detail === 'string' ? plan.detail : '',
+                createdAt: plan?.createdAt || new Date().toISOString(),
+                children: Array.isArray(plan?.children) ? plan.children.map(child => ({
+                    id: child?.id || `lpc_${Date.now()}`,
+                    name: typeof child?.name === 'string' ? child.name : '拆解任务',
+                    done: !!child?.done
+                })) : []
+            }));
+
+            Object.keys(normalized.todoData).forEach(dateStr => {
+                normalized.todoData[dateStr] = normalized.todoData[dateStr].map(item => ({
+                    id: item?.id || `td_${Date.now()}`,
+                    name: typeof item?.name === 'string' ? item.name : '',
+                    done: !!item?.done,
+                    planId: typeof item?.planId === 'string' ? item.planId : ''
+                }));
             });
 
             Object.keys(normalized.habitRecords).forEach(dateStr => {
@@ -1347,6 +1446,65 @@
             focusReminderVisible = false;
         }
 
+        function hideFocusSummaryModal() {
+            const modal = document.getElementById('focus-summary-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            focusSummaryState.visible = false;
+        }
+
+        function showFocusSummaryModal(taskSnapshot, afterFinish = null) {
+            const modal = document.getElementById('focus-summary-modal');
+            if (!modal) return;
+            focusSummaryState.taskSnapshot = taskSnapshot;
+            focusSummaryState.afterFinish = afterFinish;
+            focusSummaryState.visible = true;
+            document.getElementById('focus-summary-meta').textContent = `${taskSnapshot.name} · ${taskSnapshot.duration} 分钟`;
+            document.getElementById('focus-summary-completed').value = '';
+            document.getElementById('focus-summary-pending').value = '';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function finalizeCurrentTask(taskSnapshot, summary = {}) {
+            if (!taskSnapshot) return;
+            const t = taskSnapshot.dateStr;
+            ensureDateDataExists(t);
+            if (taskSnapshot.duration >= 1) {
+                if (taskSnapshot.duration >= 45 && !taskSnapshot.bonusGranted) {
+                    addBonusRecord({ dateStr: t, amount: 1, reason: `${taskSnapshot.name} 专注满 ${taskSnapshot.duration} 分钟`, source: 'focus-complete' });
+                }
+                D.taskData[t].push({
+                    id: taskSnapshot.id,
+                    name: taskSnapshot.name,
+                    startTime: taskSnapshot.startTime,
+                    endTime: taskSnapshot.endTime,
+                    duration: taskSnapshot.duration,
+                    completedSummary: (summary.completedSummary || '').trim(),
+                    pendingSummary: (summary.pendingSummary || '').trim()
+                });
+            }
+            currentTask = null;
+            hideFocusReminder();
+            hideFocusLeaveConfirm();
+            hideFocusSummaryModal();
+            focusLeaveState.pending = false;
+            focusLeaveState.reason = '';
+            document.getElementById('current-task-container').classList.add('hidden');
+            setFocusLandscapeButtonVisible(false);
+            setManualFocusLandscapeMode(false);
+            deactivateMobileFocusMode();
+            saveData();
+            updateFocusReliefDisplay();
+            renderTodayTasksTimeline();
+            renderPenaltySummary();
+            const afterFinish = focusSummaryState.afterFinish;
+            focusSummaryState.taskSnapshot = null;
+            focusSummaryState.afterFinish = null;
+            if (typeof afterFinish === 'function') afterFinish();
+        }
+
         function showFocusReminder(elapsedMin) {
             const modal = document.getElementById('focus-reminder-modal');
             if (!modal) return;
@@ -1389,35 +1547,21 @@
         function finishCurrentTask() {
             if (!currentTask) return;
             clearInterval(taskTimer);
-            const t = getTodayStr();
-            ensureDateDataExists(t);
             const duration = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
-            if (duration >= 1) {
-                if (duration >= 45 && !currentTask.bonusGranted) {
-                    currentTask.bonusGranted = true;
-                    addBonusRecord({ dateStr: t, amount: 1, reason: `${currentTask.name} 专注满 ${duration} 分钟`, source: 'focus-complete' });
-                }
-                D.taskData[t].push({
-                    id: 't_' + Date.now(),
-                    name: currentTask.name,
-                    startTime: currentTask.startTime,
-                    endTime: getTimeStr(),
-                    duration
-                });
+            const taskSnapshot = {
+                id: 't_' + Date.now(),
+                name: currentTask.name,
+                startTime: currentTask.startTime,
+                endTime: getTimeStr(),
+                duration,
+                dateStr: getTodayStr(),
+                bonusGranted: !!currentTask.bonusGranted
+            };
+            if (duration < 1) {
+                finalizeCurrentTask(taskSnapshot);
+                return;
             }
-            currentTask = null;
-            hideFocusReminder();
-            hideFocusLeaveConfirm();
-            focusLeaveState.pending = false;
-            focusLeaveState.reason = '';
-            document.getElementById('current-task-container').classList.add('hidden');
-            setFocusLandscapeButtonVisible(false);
-            setManualFocusLandscapeMode(false);
-            deactivateMobileFocusMode();
-            saveData();
-            updateFocusReliefDisplay();
-            renderTodayTasksTimeline();
-            renderPenaltySummary();
+            showFocusSummaryModal(taskSnapshot);
         }
 
         function handleBackPainExit() {
@@ -1434,15 +1578,26 @@
             record.count += 1;
             record.history.unshift({ time: getTimeStr(), task: currentTask.name });
             const advice = getFocusReliefAdvice(record);
-            finishCurrentTask();
-            if (advice) {
+            const afterFinish = advice ? () => {
                 showFocusReminder(record.count * 45 || 45);
                 document.getElementById('focus-reminder-title').textContent = '腰背已经在报警了';
                 document.getElementById('focus-reminder-message').textContent = advice;
                 document.getElementById('focus-reminder-elapsed').textContent = `已用 ${record.count} 次`;
                 document.getElementById('focus-reminder-ok').textContent = '知道了';
                 document.getElementById('focus-reminder-continue').textContent = '稍后再看';
-            }
+            } : null;
+            clearInterval(taskTimer);
+            const duration = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
+            const taskSnapshot = {
+                id: 't_' + Date.now(),
+                name: currentTask.name,
+                startTime: currentTask.startTime,
+                endTime: getTimeStr(),
+                duration,
+                dateStr,
+                bonusGranted: !!currentTask.bonusGranted
+            };
+            showFocusSummaryModal(taskSnapshot, afterFinish);
         }
 
         function initFocusLeaveConfirm() {
@@ -1789,8 +1944,8 @@
         }
         
         function saveData(options = {}) { 
+            checkAchievements();
             writeLocalData(options.touchLocalMeta !== false);
-            checkAchievements(); 
             if(typeof updateSidebar === 'function') updateSidebar(); 
             if (!options.skipRemote) scheduleRemoteSave();
         }
@@ -1810,7 +1965,7 @@
                     if(sec === 'phone') { renderPhoneHistory(); renderPenaltySummary(); }
                     if(sec === 'habits') renderHabitsForDate(getTodayStr());
                     if(sec === 'journal') document.getElementById('journal-date-picker').dispatchEvent(new Event('change'));
-                    if(sec === 'tasks') { renderTodos(); renderTodayTasksTimeline(); }
+                    if(sec === 'tasks') { renderLongPlans(); renderTodos(); renderTodayTasksTimeline(); }
                     if(sec === 'achievements') renderAchievements();
                 });
             });
@@ -1941,22 +2096,114 @@
             if(confirm('删除这个时间段记录？')) { D.timeBlocks[dateStr] = D.timeBlocks[dateStr].filter(x => x.id !== id); saveData(); renderTimeBlocksCalendar(dateStr); }
         }
 
+        function getLongPlanById(planId) {
+            return (D.longPlanData?.plans || []).find(plan => plan.id === planId) || null;
+        }
+
+        function getLongPlanTitle(planId) {
+            return getLongPlanById(planId)?.title || '';
+        }
+
+        function renderTodoPlanOptions(selectedPlanId = '') {
+            const select = document.getElementById('todo-plan-select');
+            if (!select) return;
+            const options = ['<option value="">不关联长期任务</option>'];
+            (D.longPlanData?.plans || []).forEach(plan => {
+                options.push(`<option value="${plan.id}" ${selectedPlanId === plan.id ? 'selected' : ''}>${escapeHtml(plan.title)}</option>`);
+            });
+            select.innerHTML = options.join('');
+        }
+
+        function renderLongPlans() {
+            const container = document.getElementById('long-plan-list-container');
+            if (!container) return;
+            const plans = D.longPlanData?.plans || [];
+            renderTodoPlanOptions(document.getElementById('todo-plan-select')?.value || '');
+            if (!plans.length) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-6">还没有长期任务，先建立一个长期目标</div>';
+                return;
+            }
+            container.innerHTML = '';
+            plans.forEach(plan => {
+                const totalChildren = plan.children.length;
+                const doneChildren = plan.children.filter(child => child.done).length;
+                const progressText = totalChildren ? `${doneChildren}/${totalChildren}` : '未拆解';
+                const childrenHtml = totalChildren
+                    ? plan.children.map(child => `
+                        <label class="flex items-center justify-between gap-3 bg-white/80 rounded-xl px-3 py-2 border border-gray-100">
+                            <span class="flex items-center gap-3 min-w-0">
+                                <input type="checkbox" ${child.done ? 'checked' : ''} onchange="toggleLongPlanChild('${plan.id}', '${child.id}')">
+                                <span class="text-sm font-bold ${child.done ? 'line-through text-gray-400' : 'text-textmain'} truncate">${escapeHtml(child.name)}</span>
+                            </span>
+                            <button class="text-gray-300 hover:text-danger text-xs" onclick="deleteLongPlanChild('${plan.id}', '${child.id}')"><i class="fa fa-trash"></i></button>
+                        </label>
+                    `).join('')
+                    : '<div class="text-xs text-gray-400 font-medium py-2">先拆一个更小、今天或这周能推进的子任务。</div>';
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-sm sm:text-base font-black text-textmain truncate">${escapeHtml(plan.title)}</h4>
+                                    <span class="text-[10px] font-black uppercase tracking-[0.18em] px-2 py-1 rounded-full bg-primary/10 text-primary">${progressText}</span>
+                                </div>
+                                ${plan.detail ? `<div class="text-xs sm:text-sm text-textmuted leading-6 whitespace-pre-wrap">${escapeHtml(plan.detail)}</div>` : ''}
+                            </div>
+                            <button class="text-gray-300 hover:text-danger p-1.5" onclick="deleteLongPlan('${plan.id}')" title="删除长期任务"><i class="fa fa-trash"></i></button>
+                        </div>
+                        <div class="flex gap-2 mb-3">
+                            <input type="text" id="long-plan-child-input-${plan.id}" placeholder="拆一个子任务，比如：补完方法部分结构" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-primary">
+                            <button class="bg-primary text-white px-3 py-2 rounded-lg font-bold text-sm" onclick="addLongPlanChild('${plan.id}')">拆解</button>
+                        </div>
+                        <div class="space-y-2">${childrenHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
         // ================= Todo 鏍稿績寮哄寲閮ㄥ垎 =================
         function initTasks() {
+            const addLongPlanBtn = document.getElementById('btn-add-long-plan');
+            const longPlanTitleInput = document.getElementById('long-plan-title-input');
+            const longPlanDetailInput = document.getElementById('long-plan-detail-input');
             const addBtn = document.getElementById('btn-add-todo');
             const input = document.getElementById('new-todo-input');
             
+            const addLongPlan = () => {
+                const title = longPlanTitleInput.value.trim();
+                const detail = longPlanDetailInput.value.trim();
+                if (!title) return;
+                D.longPlanData.plans.unshift({
+                    id: 'lp_' + Date.now(),
+                    title,
+                    detail,
+                    createdAt: new Date().toISOString(),
+                    children: []
+                });
+                longPlanTitleInput.value = '';
+                longPlanDetailInput.value = '';
+                saveData();
+                renderLongPlans();
+            };
+
             const addTodo = () => {
                 const name = input.value.trim(); 
                 if(name){ 
                     const t = getTodayStr(); ensureDateDataExists(t);
-                    D.todoData[t].push({id:'td_'+Date.now(), name:name, done:false}); 
+                    D.todoData[t].push({
+                        id:'td_'+Date.now(),
+                        name:name,
+                        done:false,
+                        planId: document.getElementById('todo-plan-select')?.value || ''
+                    }); 
                     input.value = ''; 
                     saveData(); 
                     renderTodos(); 
                 }
             };
 
+            if (addLongPlanBtn) addLongPlanBtn.onclick = addLongPlan;
+            if (longPlanTitleInput) longPlanTitleInput.onkeypress = e => { if (e.key === 'Enter') addLongPlan(); };
             addBtn.onclick = addTodo;
             input.onkeypress = (e) => { if(e.key === 'Enter') addTodo(); };
 
@@ -1977,6 +2224,8 @@
                 };
                 updateFocusLandscapeButtonLabel();
             }
+            renderLongPlans();
+            renderTodoPlanOptions();
         }
 
         function renderTodos() { 
@@ -1991,11 +2240,15 @@
 
             todayTodos.forEach(t => { 
                 const mobileOnly = !isProbablyMobileDevice();
+                const linkedPlanTitle = getLongPlanTitle(t.planId);
                 container.innerHTML += `
                 <div class="flex items-center justify-between p-2.5 sm:p-3 bg-white rounded-xl border border-gray-100 shadow-sm mb-2 group transition-all hover:border-secondary/30">
                     <label class="flex items-center cursor-pointer flex-1 truncate mr-2">
                         <input type="checkbox" class="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded checked:bg-secondary checked:border-secondary transition-all cursor-pointer mr-3 flex-shrink-0" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}')">
-                        <span class="font-bold text-sm text-textmain peer-checked:line-through peer-checked:text-gray-400 truncate transition-all" title="${t.name}">${t.name}</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block font-bold text-sm text-textmain peer-checked:line-through peer-checked:text-gray-400 truncate transition-all" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</span>
+                            ${linkedPlanTitle ? `<span class="inline-flex mt-1 text-[10px] font-black tracking-[0.16em] uppercase px-2 py-1 rounded-full bg-primary/10 text-primary">${escapeHtml(linkedPlanTitle)}</span>` : ''}
+                        </span>
                     </label>
                     <div class="flex items-center gap-1">
                         <button onclick="startTask('${t.name}')" class="${mobileOnly ? 'text-gray-300 bg-gray-50 cursor-not-allowed' : 'text-secondary hover:bg-secondary hover:text-white'} w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-colors" title="${mobileOnly ? '仅手机端可开启专注' : '开始心流专注'}" ${mobileOnly ? 'disabled' : ''}>
@@ -2019,6 +2272,46 @@
             const t = getTodayStr();
             D.todoData[t] = D.todoData[t].filter(x => x.id !== id);
             saveData(); renderTodos();
+        };
+
+        window.deleteLongPlan = function(planId) {
+            if (!confirm('删除这个长期任务？已关联的每日待办不会删除，但会失去关联。')) return;
+            D.longPlanData.plans = (D.longPlanData.plans || []).filter(plan => plan.id !== planId);
+            Object.keys(D.todoData).forEach(dateStr => {
+                D.todoData[dateStr] = (D.todoData[dateStr] || []).map(todo => todo.planId === planId ? { ...todo, planId: '' } : todo);
+            });
+            saveData();
+            renderLongPlans();
+            renderTodos();
+        };
+
+        window.addLongPlanChild = function(planId) {
+            const input = document.getElementById(`long-plan-child-input-${planId}`);
+            const name = input?.value.trim();
+            if (!name) return;
+            const plan = getLongPlanById(planId);
+            if (!plan) return;
+            plan.children.unshift({ id: 'lpc_' + Date.now(), name, done: false });
+            input.value = '';
+            saveData();
+            renderLongPlans();
+        };
+
+        window.toggleLongPlanChild = function(planId, childId) {
+            const plan = getLongPlanById(planId);
+            const child = plan?.children.find(item => item.id === childId);
+            if (!child) return;
+            child.done = !child.done;
+            saveData();
+            renderLongPlans();
+        };
+
+        window.deleteLongPlanChild = function(planId, childId) {
+            const plan = getLongPlanById(planId);
+            if (!plan) return;
+            plan.children = plan.children.filter(child => child.id !== childId);
+            saveData();
+            renderLongPlans();
         };
 
         window.startTask = async n => { 
@@ -2070,15 +2363,25 @@
             } else {
                 emptyMsg.classList.add('hidden');
                 tasks.forEach(t => { 
+                    const completed = escapeHtml((t.completedSummary || '').trim());
+                    const pending = escapeHtml((t.pendingSummary || '').trim());
+                    const taskName = escapeHtml(t.name || '专注任务');
+                    const summaryHtml = completed || pending
+                        ? `<div class="mt-3 space-y-2">
+                            ${completed ? `<div class="rounded-xl bg-secondary/10 px-3 py-2.5"><div class="text-[10px] font-black uppercase tracking-[0.18em] text-secondary/80 mb-1">完成了什么</div><div class="text-xs sm:text-sm text-textmain leading-6 whitespace-pre-wrap">${completed}</div></div>` : ''}
+                            ${pending ? `<div class="rounded-xl bg-accent/15 px-3 py-2.5"><div class="text-[10px] font-black uppercase tracking-[0.18em] text-amber-700 mb-1">待办什么</div><div class="text-xs sm:text-sm text-textmain leading-6 whitespace-pre-wrap">${pending}</div></div>` : ''}
+                        </div>`
+                        : '';
                     container.innerHTML += `
                     <div class="relative">
                         <div class="absolute -left-[21px] sm:-left-[29px] top-1 w-3 h-3 bg-secondary rounded-full border-2 border-white shadow-sm"></div>
                         <div class="bg-gray-50 hover:bg-white p-3 rounded-xl border border-gray-100 shadow-sm transition-colors text-sm mb-3">
                             <div class="flex justify-between items-start mb-1">
-                                <strong class="font-black text-textmain">${t.name}</strong>
+                                <strong class="font-black text-textmain">${taskName}</strong>
                                 <span class="text-xs font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded">${t.duration}m</span>
                             </div>
                             <div class="text-xs text-gray-500 font-medium"><i class="fa fa-clock-o mr-1"></i>${t.startTime} - ${t.endTime}</div>
+                            ${summaryHtml}
                         </div>
                     </div>`; 
                 }); 
@@ -2406,7 +2709,29 @@
             }
         }
 
-        function checkAchievements() { document.getElementById('unlocked-count').textContent=D.unlockedAchievements.length; document.getElementById('total-achievements-count').textContent=ACHIEVEMENTS_DB.length; }
+        function maybeShowAchievementPopup(achievement) {
+            const popup = document.getElementById('achievement-popup');
+            if (!popup || !achievement) return;
+            document.getElementById('popup-achievement-title').textContent = achievement.name;
+            document.getElementById('popup-achievement-desc').textContent = achievement.desc;
+            document.getElementById('popup-icon').className = `fa ${achievement.icon} text-4xl sm:text-5xl text-white drop-shadow-md`;
+            document.getElementById('popup-icon-bg').className = `w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mb-4 sm:mb-5 shadow-lg border-4 border-white bg-${achievement.color}`;
+            popup.classList.remove('hidden');
+            setTimeout(() => popup.classList.add('hidden'), 6000);
+        }
+
+        function checkAchievements() {
+            const newlyUnlocked = [];
+            ACHIEVEMENTS_DB.forEach(ach => {
+                if (!D.unlockedAchievements.includes(ach.id) && ach.condition(D)) {
+                    D.unlockedAchievements.push(ach.id);
+                    newlyUnlocked.push(ach);
+                }
+            });
+            document.getElementById('unlocked-count').textContent = D.unlockedAchievements.length;
+            document.getElementById('total-achievements-count').textContent = ACHIEVEMENTS_DB.length;
+            if (newlyUnlocked.length) maybeShowAchievementPopup(newlyUnlocked[0]);
+        }
         
         function renderAchievements() {
             ['focus', 'routine', 'resist', 'habit'].forEach(cat => { const el = document.getElementById(`ach-grid-${cat}`); if(el) el.innerHTML = ''; });
@@ -2592,6 +2917,25 @@
             }
         }
 
+        function initFocusSummary() {
+            const saveBtn = document.getElementById('focus-summary-save');
+            const skipBtn = document.getElementById('focus-summary-skip');
+            const skipTopBtn = document.getElementById('focus-summary-skip-top');
+            const submitSummary = (saveText) => {
+                if (!focusSummaryState.taskSnapshot) return;
+                finalizeCurrentTask(
+                    focusSummaryState.taskSnapshot,
+                    saveText ? {
+                        completedSummary: document.getElementById('focus-summary-completed').value,
+                        pendingSummary: document.getElementById('focus-summary-pending').value
+                    } : {}
+                );
+            };
+            if (saveBtn) saveBtn.addEventListener('click', () => submitSummary(true));
+            if (skipBtn) skipBtn.addEventListener('click', () => submitSummary(false));
+            if (skipTopBtn) skipTopBtn.addEventListener('click', () => submitSummary(false));
+        }
+
         function initFocusGuard() {
             document.addEventListener('visibilitychange', () => {
                 if (focusGuard.active && document.hidden) recordFocusGuardViolation('切到后台');
@@ -2614,6 +2958,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             startClock();
             initFocusReminder();
+            initFocusSummary();
             initFocusLeaveConfirm();
             initSync();
             try {
