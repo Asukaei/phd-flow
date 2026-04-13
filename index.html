@@ -1258,6 +1258,7 @@
         function settleFocusLeave(reason) {
             if (!currentTask) return;
             const elapsedMin = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
+            if (elapsedMin < 1) return;
             if (elapsedMin < 15) {
                 addPenaltyRecord({ points: 2, reason: `手机端专注 ${elapsedMin} 分钟确认离开：${reason}`, source: 'focus-guard' });
             } else if (elapsedMin < 45) {
@@ -1385,17 +1386,19 @@
             const t = getTodayStr();
             ensureDateDataExists(t);
             const duration = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
-            if (duration >= 45 && !currentTask.bonusGranted) {
-                currentTask.bonusGranted = true;
-                addBonusRecord({ dateStr: t, amount: 1, reason: `${currentTask.name} 专注满 ${duration} 分钟`, source: 'focus-complete' });
+            if (duration >= 1) {
+                if (duration >= 45 && !currentTask.bonusGranted) {
+                    currentTask.bonusGranted = true;
+                    addBonusRecord({ dateStr: t, amount: 1, reason: `${currentTask.name} 专注满 ${duration} 分钟`, source: 'focus-complete' });
+                }
+                D.taskData[t].push({
+                    id: 't_' + Date.now(),
+                    name: currentTask.name,
+                    startTime: currentTask.startTime,
+                    endTime: getTimeStr(),
+                    duration
+                });
             }
-            D.taskData[t].push({
-                id: 't_' + Date.now(),
-                name: currentTask.name,
-                startTime: currentTask.startTime,
-                endTime: getTimeStr(),
-                duration
-            });
             currentTask = null;
             hideFocusReminder();
             hideFocusLeaveConfirm();
@@ -1413,6 +1416,11 @@
 
         function handleBackPainExit() {
             if (!currentTask) return;
+            const elapsedMin = Math.floor((Date.now() - currentTask.startTimestamp) / 60000);
+            if (elapsedMin < 1) {
+                finishCurrentTask();
+                return;
+            }
             const dateStr = getTodayStr();
             ensureDateDataExists(dateStr);
             ensureFocusReliefDateExists(dateStr);
