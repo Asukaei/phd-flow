@@ -382,6 +382,9 @@
                                         <div id="current-real-time" class="text-3xl sm:text-4xl font-black text-textmain font-mono tracking-[0.12em]">--:--:--</div>
                                         <div id="current-backpain-count" class="mt-3 text-xs sm:text-sm font-black text-danger bg-danger/10 px-3 py-1.5 rounded-full">实在腰疼：今日 0 次</div>
                                     </div>
+                                    <button id="focus-landscape-btn" class="hidden w-full mb-3 bg-white text-secondary border border-secondary/20 py-3 rounded-xl font-bold transition-colors hover:bg-secondary/5">
+                                        <i class="fa fa-rotate-right mr-2"></i>横屏显示
+                                    </button>
                                     <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow transition-transform active:scale-95">结束专注并记录时间</button>
                                 </div>
                             </div>
@@ -1182,6 +1185,25 @@
             }
         }
 
+        async function tryLockFocusLandscape() {
+            await tryEnterFocusFullscreen();
+            if (screen.orientation?.lock) {
+                try {
+                    await screen.orientation.lock('landscape');
+                    return true;
+                } catch (err) {
+                    console.warn('锁定横屏失败：', err);
+                }
+            }
+            return false;
+        }
+
+        async function unlockFocusOrientation() {
+            if (screen.orientation?.unlock) {
+                try { screen.orientation.unlock(); } catch (err) { console.warn('解除横屏锁定失败：', err); }
+            }
+        }
+
         async function exitFocusFullscreen() {
             if (document.fullscreenElement && document.exitFullscreen) {
                 try { await document.exitFullscreen(); } catch (err) { console.warn('退出全屏失败：', err); }
@@ -1239,6 +1261,12 @@
             document.getElementById('mobile-focus-tip').classList.toggle('hidden', !visible);
         }
 
+        function setFocusLandscapeButtonVisible(visible) {
+            const btn = document.getElementById('focus-landscape-btn');
+            if (!btn) return;
+            btn.classList.toggle('hidden', !visible);
+        }
+
         async function activateMobileFocusMode(taskName) {
             focusGuard.active = true;
             focusGuard.immersive = true;
@@ -1248,7 +1276,7 @@
             const box = document.getElementById('current-task-container');
             box.classList.add('fixed', 'inset-3', 'z-40', 'overflow-auto');
             setMobileFocusHint(true);
-            await tryEnterFocusFullscreen();
+            await tryLockFocusLandscape();
         }
 
         async function deactivateMobileFocusMode() {
@@ -1259,6 +1287,7 @@
             const box = document.getElementById('current-task-container');
             box.classList.remove('fixed', 'inset-3', 'z-40', 'overflow-auto');
             setMobileFocusHint(false);
+            await unlockFocusOrientation();
             await exitFocusFullscreen();
         }
 
@@ -1332,6 +1361,7 @@
             focusLeaveState.pending = false;
             focusLeaveState.reason = '';
             document.getElementById('current-task-container').classList.add('hidden');
+            setFocusLandscapeButtonVisible(false);
             deactivateMobileFocusMode();
             saveData();
             updateFocusReliefDisplay();
@@ -1879,6 +1909,13 @@
                     finishCurrentTask();
                 }
             };
+            const landscapeBtn = document.getElementById('focus-landscape-btn');
+            if (landscapeBtn) {
+                landscapeBtn.onclick = async () => {
+                    const locked = await tryLockFocusLandscape();
+                    if (!locked) alert('当前浏览器暂不支持自动锁定横屏。你可以先点全屏，再手动把手机横过来。');
+                };
+            }
         }
 
         function renderTodos() { 
@@ -1932,6 +1969,7 @@
             document.getElementById('current-task-name').textContent = n; 
             document.getElementById('current-task-container').classList.remove('hidden'); 
             document.getElementById('current-real-time').textContent = getTimeStr();
+            setFocusLandscapeButtonVisible(true);
             updateFocusReliefDisplay();
             hideFocusReminder();
             hideFocusLeaveConfirm();
