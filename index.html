@@ -486,9 +486,11 @@
                         </div>
                         <div class="bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-200 text-center">
                             <h3 class="text-base sm:text-lg font-bold text-gray-700 mb-2">本地备份恢复</h3>
-                            <p class="text-xs text-gray-500 mb-4 sm:mb-6">从本地 JSON 文件恢复数据，并覆盖当前内容。</p>
-                            <label class="w-full bg-white text-gray-800 border border-gray-300 font-bold py-3 sm:py-4 rounded-xl shadow-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer text-sm sm:text-base">
+                            <p id="import-backup-hint" class="text-xs text-gray-500 mb-4 sm:mb-6">从本地 JSON 文件恢复数据，并覆盖当前内容。</p>
+                            <button id="btn-import-smart" type="button" class="w-full bg-white text-gray-800 border border-gray-300 font-bold py-3 sm:py-4 rounded-xl shadow-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer text-sm sm:text-base">
                                 <i class="fa fa-upload mr-2"></i> 导入备份文件
+                            </button>
+                            <label class="hidden">
                                 <input type="file" id="import-file-input" class="hidden" accept=".json,application/json">
                             </label>
                         </div>
@@ -973,6 +975,7 @@
         const SYNC_SETTINGS_KEY = 'phdWorkspaceCloudSyncSettings';
         const SYNC_META_KEY = 'phdWorkspaceCloudSyncMeta';
         const HOLIDAY_CACHE_KEY = 'phdWorkspaceHolidayCache';
+        const BACKUP_IMPORT_PICKER_ID = 'phd-flow-backup-import';
         let syncDebounceTimer = null;
         let syncInFlight = false;
         let syncQueued = false;
@@ -1150,7 +1153,9 @@
                     id: item?.id || `td_${Date.now()}`,
                     name: typeof item?.name === 'string' ? item.name : '',
                     done: !!item?.done,
-                    planId: typeof item?.planId === 'string' ? item.planId : ''
+                    planId: typeof item?.planId === 'string' ? item.planId : '',
+                    lineageId: typeof item?.lineageId === 'string' && item.lineageId ? item.lineageId : (item?.id || `td_${Date.now()}`),
+                    carriedFrom: typeof item?.carriedFrom === 'string' ? item.carriedFrom : ''
                 }));
             });
 
@@ -2012,6 +2017,41 @@
             if (!D.todoData[dateStr]) D.todoData[dateStr] = [];
         }
 
+        function carryForwardUnfinishedTodos(targetDateStr = getTodayStr()) {
+            ensureDateDataExists(targetDateStr);
+            const todayTodos = D.todoData[targetDateStr];
+            const todayLineages = new Set(todayTodos.map(todo => todo.lineageId || todo.id));
+            const latestTodoByLineage = new Map();
+            let changed = false;
+            let carryIndex = 0;
+
+            Object.keys(D.todoData)
+                .filter(dateStr => dateStr < targetDateStr)
+                .sort()
+                .forEach(dateStr => {
+                    (D.todoData[dateStr] || []).forEach(todo => {
+                        const lineageId = todo.lineageId || todo.id;
+                        latestTodoByLineage.set(lineageId, { todo, dateStr });
+                    });
+                });
+
+            latestTodoByLineage.forEach(({ todo, dateStr }, lineageId) => {
+                if (todo.done || todayLineages.has(lineageId)) return;
+                todayTodos.push({
+                    id: `td_${Date.now()}_${carryIndex++}`,
+                    name: todo.name,
+                    done: false,
+                    planId: todo.planId || '',
+                    lineageId,
+                    carriedFrom: dateStr
+                });
+                todayLineages.add(lineageId);
+                changed = true;
+            });
+
+            return changed;
+        }
+
         function updateSidebar() {
             const t = getTodayStr(); ensureDateDataExists(t);
             const work = D.checkinData[t].work;
@@ -2046,6 +2086,7 @@
             loadLocalData();
             loadHolidayCache();
             ensureDateDataExists(getTodayStr());
+            if (carryForwardUnfinishedTodos(getTodayStr())) writeLocalData(false);
             syncAutoPenalties(getTodayStr());
             renderSyncSettings();
             writeLocalData(false);
@@ -2314,11 +2355,14 @@
                 const name = input.value.trim(); 
                 if(name){ 
                     const t = getTodayStr(); ensureDateDataExists(t);
+                    const lineageId = 'td_' + Date.now();
                     D.todoData[t].push({
-                        id:'td_'+Date.now(),
+                        id:lineageId,
                         name:name,
                         done:false,
-                        planId: document.getElementById('todo-plan-select')?.value || ''
+                        planId: document.getElementById('todo-plan-select')?.value || '',
+                        lineageId,
+                        carriedFrom: ''
                     }); 
                     input.value = ''; 
                     saveData(); 
@@ -2354,6 +2398,7 @@
 
         function renderTodos() { 
             const container = document.getElementById('todo-list-container'); 
+            if (carryForwardUnfinishedTodos(getTodayStr())) saveData({ touchLocalMeta: false });
             container.innerHTML = ''; 
             const todayTodos = D.todoData[getTodayStr()] || [];
             
@@ -2372,6 +2417,7 @@
                         <span class="min-w-0 flex-1">
                             <span class="block font-bold text-sm text-textmain peer-checked:line-through peer-checked:text-gray-400 truncate transition-all" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</span>
                             ${linkedPlanTitle ? `<span class="inline-flex mt-1 text-[10px] font-black tracking-[0.16em] uppercase px-2 py-1 rounded-full bg-primary/10 text-primary">${escapeHtml(linkedPlanTitle)}</span>` : ''}
+                            ${t.carriedFrom ? `<span class="inline-flex mt-1 ml-1 text-[10px] font-black tracking-[0.12em] px-2 py-1 rounded-full bg-accent/20 text-amber-700">延续自 ${escapeHtml(t.carriedFrom.slice(5))}</span>` : ''}
                         </span>
                     </label>
                     <div class="flex items-center gap-1">
@@ -2711,23 +2757,73 @@
                 a.click();
             };
 
-            document.getElementById('import-file-input').onchange = e => {
-                const file = e.target.files[0];
+            const importInput = document.getElementById('import-file-input');
+            const importBtn = document.getElementById('btn-import-smart');
+            const importHint = document.getElementById('import-backup-hint');
+
+            const applyImportedBackupText = text => {
+                D = JSON.parse(text);
+                ensureDateDataExists(getTodayStr());
+                saveData();
+                alert('导入成功，当前页面会刷新。');
+                location.reload();
+            };
+
+            const importBackupFromFile = file => {
                 if (!file) return;
                 const r = new FileReader();
                 r.onload = ev => {
                     try {
-                        D = JSON.parse(ev.target.result);
-                        ensureDateDataExists(getTodayStr());
-                        saveData();
-                        alert('导入成功，当前页面会刷新。');
-                        location.reload();
+                        applyImportedBackupText(ev.target.result);
                     } catch (err) {
                         alert(`导入失败：${err.message}`);
                     }
                 };
                 r.readAsText(file);
             };
+
+            if (importHint) {
+                importHint.textContent = (window.showOpenFilePicker && !isProbablyMobileDevice())
+                    ? '电脑端会优先使用原生文件选择器，并尽量记住你上次打开备份的目录。'
+                    : '从本地 JSON 文件恢复数据，并覆盖当前内容。';
+            }
+
+            if (importBtn) {
+                importBtn.onclick = async () => {
+                    if (window.showOpenFilePicker && !isProbablyMobileDevice()) {
+                        try {
+                            const [handle] = await window.showOpenFilePicker({
+                                id: BACKUP_IMPORT_PICKER_ID,
+                                startIn: 'documents',
+                                multiple: false,
+                                excludeAcceptAllOption: false,
+                                types: [{
+                                    description: 'JSON Backup',
+                                    accept: { 'application/json': ['.json'] }
+                                }]
+                            });
+                            if (!handle) return;
+                            const file = await handle.getFile();
+                            importBackupFromFile(file);
+                            return;
+                        } catch (err) {
+                            if (err?.name !== 'AbortError') {
+                                console.warn('原生文件选择器不可用，回退到普通上传：', err);
+                            } else {
+                                return;
+                            }
+                        }
+                    }
+                    importInput?.click();
+                };
+            }
+
+            if (importInput) {
+                importInput.onchange = e => {
+                    importBackupFromFile(e.target.files[0]);
+                    e.target.value = '';
+                };
+            }
         }
 
         function initPhone() {
