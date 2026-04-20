@@ -57,6 +57,157 @@
         .focus-leave-pill { background: linear-gradient(135deg, rgba(224,162,162,0.16), rgba(238,203,168,0.22)); }
         .focus-leave-danger { background: linear-gradient(135deg, #d88f8f, #cf7777); }
         .focus-leave-safe { background: linear-gradient(135deg, #b8accb, #9fbcdb); }
+        .focus-stage {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.72);
+            background:
+                radial-gradient(circle at 16% 18%, rgba(255,255,255,0.24), rgba(255,255,255,0) 26%),
+                radial-gradient(circle at 82% 14%, rgba(238,203,168,0.24), rgba(238,203,168,0) 22%),
+                radial-gradient(circle at 50% 120%, rgba(159,188,219,0.3), rgba(159,188,219,0) 42%),
+                linear-gradient(145deg, #1f2535 0%, #28314a 32%, #34435f 68%, #4a5874 100%);
+            box-shadow: 0 28px 90px -36px rgba(22, 28, 44, 0.85), inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+        .focus-stage::before,
+        .focus-stage::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+            filter: blur(10px);
+        }
+        .focus-stage::before {
+            width: 18rem;
+            height: 18rem;
+            top: -8rem;
+            left: -6rem;
+            background: rgba(187,174,204,0.18);
+        }
+        .focus-stage::after {
+            width: 20rem;
+            height: 20rem;
+            right: -8rem;
+            bottom: -10rem;
+            background: rgba(238,203,168,0.14);
+        }
+        .focus-stage-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.12));
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        .focus-stage-glow {
+            position: absolute;
+            inset: auto 8% 18% 8%;
+            height: 7rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(187,174,204,0.3), rgba(187,174,204,0) 68%);
+            filter: blur(16px);
+            pointer-events: none;
+        }
+        .focus-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+        }
+        .focus-kicker-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 999px;
+            background: #eecba8;
+            box-shadow: 0 0 0 6px rgba(238,203,168,0.12);
+        }
+        .focus-patience-word {
+            font-size: clamp(3.6rem, 15vw, 8.6rem);
+            line-height: 0.88;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #f8f6f1;
+            text-shadow: 0 10px 35px rgba(0,0,0,0.3);
+        }
+        .focus-patience-shadow {
+            position: absolute;
+            inset: auto 0 27%;
+            font-size: clamp(3.6rem, 15vw, 8.6rem);
+            line-height: 0.88;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.06);
+            transform: translateY(16%);
+            pointer-events: none;
+            user-select: none;
+        }
+        .focus-stage-panel {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            border-radius: 1.6rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(11, 16, 28, 0.24);
+            backdrop-filter: blur(14px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .focus-stage-time {
+            font-size: clamp(2.4rem, 9vw, 4.8rem);
+            line-height: 1;
+            letter-spacing: 0.12em;
+            color: #f8f6f1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.24);
+        }
+        .focus-stage-clock {
+            font-size: clamp(1.4rem, 5vw, 2.4rem);
+            line-height: 1;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.9);
+        }
+        .focus-stage-task {
+            font-size: clamp(1rem, 2.3vw, 1.35rem);
+            font-weight: 800;
+            color: rgba(255,255,255,0.96);
+        }
+        .focus-stage-meta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.5rem;
+            padding: 0.72rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        .focus-stage-btn {
+            min-height: 3.35rem;
+            border-radius: 1rem;
+        }
+        .focus-stage-btn-primary {
+            background: linear-gradient(135deg, #eecba8, #d7a77a);
+            color: #2f251f;
+            box-shadow: 0 18px 38px -24px rgba(238,203,168,0.9);
+        }
+        .focus-stage-btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
         .habit-progress-card {
             position: relative;
             overflow: hidden;
@@ -558,22 +709,32 @@
                         </div>
 
                         <div class="lg:col-span-6 space-y-4 sm:space-y-6">
-                            <div id="current-task-container" class="bg-white border-2 border-secondary rounded-2xl p-5 sm:p-6 hidden shadow-lg">
-                                <div class="flex flex-col items-center text-center">
-                                    <span class="text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2 sm:mb-3">● 正在专注心流</span>
-                                    <div id="mobile-focus-badge" class="hidden text-[11px] sm:text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full mb-2">手机端约束模式已开启</div>
-                                    <div id="mobile-focus-tip" class="hidden text-xs text-gray-500 font-bold mb-3">切到后台或退出全屏后，会触发离开确认</div>
-                                    <div class="text-lg sm:text-xl font-black text-textmain mb-1" id="current-task-name">-</div>
-                                    <div class="text-4xl sm:text-5xl font-black text-secondary mt-1 font-mono tracking-wider" id="current-task-time">00:00:00</div>
-                                    <div class="mt-3 mb-4 sm:mb-5 flex flex-col items-center">
-                                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-[0.28em] text-textmuted/80 mb-2">现实时间</span>
-                                        <div id="current-real-time" class="text-3xl sm:text-4xl font-black text-textmain font-mono tracking-[0.12em]">--:--:--</div>
-                                        <div id="current-backpain-count" class="mt-3 text-xs sm:text-sm font-black text-danger bg-danger/10 px-3 py-1.5 rounded-full">实在腰疼：今日 0 次</div>
+                            <div id="current-task-container" class="focus-stage rounded-[2rem] p-5 sm:p-6 hidden">
+                                <div class="focus-stage-grid"></div>
+                                <div class="focus-stage-glow"></div>
+                                <div class="relative z-10 flex flex-col items-center text-center">
+                                    <span class="focus-kicker mb-3 sm:mb-4"><span class="focus-kicker-dot"></span>Deep Focus Mode</span>
+                                    <div class="focus-patience-shadow" aria-hidden="true">PATIENCE!</div>
+                                    <div class="focus-patience-word mb-2">PATIENCE!</div>
+                                    <p class="text-sm sm:text-base font-bold text-white/72 max-w-lg mb-5 sm:mb-6 leading-7">别急着切走。把注意力压住，把动作放慢，让这一段时间只服务于眼前这一件事。</p>
+                                    <div class="focus-stage-panel px-4 py-4 sm:px-5 sm:py-5 mb-4 sm:mb-5">
+                                        <div class="text-[11px] sm:text-xs font-black text-white/55 uppercase tracking-[0.28em] mb-2">Current Mission</div>
+                                        <div class="focus-stage-task mb-3" id="current-task-name">-</div>
+                                        <div class="focus-stage-time font-mono mb-4" id="current-task-time">00:00:00</div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
+                                            <div class="focus-stage-meta flex-col !rounded-[1.2rem]">
+                                                <span class="text-[10px] sm:text-[11px] uppercase tracking-[0.24em] text-white/45 mb-1">现实时间</span>
+                                                <div id="current-real-time" class="focus-stage-clock font-mono">--:--:--</div>
+                                            </div>
+                                            <div id="current-backpain-count" class="focus-stage-meta !rounded-[1.2rem] text-danger bg-danger/10 border-danger/15">实在腰疼：今日 0 次</div>
+                                        </div>
                                     </div>
-                                    <button id="focus-landscape-btn" class="hidden w-full mb-3 bg-white text-secondary border border-secondary/20 py-3 rounded-xl font-bold transition-colors hover:bg-secondary/5">
+                                    <div id="mobile-focus-badge" class="hidden text-[11px] sm:text-xs font-bold text-[#ffe4e1] bg-white/10 border border-white/10 px-3 py-1 rounded-full mb-2">手机端约束模式已开启</div>
+                                    <div id="mobile-focus-tip" class="hidden text-xs text-white/60 font-bold mb-4">切到后台或退出全屏后，会触发离开确认</div>
+                                    <button id="focus-landscape-btn" class="focus-stage-btn focus-stage-btn-secondary hidden w-full mb-3 font-bold transition-colors hover:bg-white/12">
                                         <i class="fa fa-rotate-right mr-2"></i>横屏显示
                                     </button>
-                                    <button id="end-task" class="w-full bg-secondary text-white py-3 rounded-xl font-bold btn-shadow transition-transform active:scale-95">结束专注并记录时间</button>
+                                    <button id="end-task" class="focus-stage-btn focus-stage-btn-primary w-full font-bold transition-transform active:scale-95">结束专注并记录时间</button>
                                 </div>
                             </div>
 
@@ -1669,8 +1830,8 @@
             const count = D.focusReliefData.records[dateStr].count || 0;
             el.textContent = `实在腰疼：今日 ${count} 次`;
             el.className = count > 2
-                ? 'mt-3 text-xs sm:text-sm font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full'
-                : 'mt-3 text-xs sm:text-sm font-black text-danger bg-danger/10 px-3 py-1.5 rounded-full';
+                ? 'focus-stage-meta text-amber-900 bg-amber-100/95 border border-amber-200 rounded-[1.2rem]'
+                : 'focus-stage-meta text-danger bg-danger/10 border border-danger/15 rounded-[1.2rem]';
         }
 
         function finishCurrentTask() {
