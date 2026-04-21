@@ -933,7 +933,7 @@
                                     <div class="text-xl font-black text-amber-600" id="stats-penalty-saving">0 元</div>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 font-bold mt-3">规则：1 个 Bonus 可抵消 2 个惩罚点；月底按净惩罚点结算。</p>
+                            <p class="text-xs text-gray-500 font-bold mt-3">规则：2 个 Bonus 可抵消 1 个惩罚点；月底按净惩罚点结算。</p>
                         </div>
                     </div>
                     <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm mb-4 sm:mb-6">
@@ -1581,7 +1581,7 @@
             Array.from(allDates).forEach(day => {
                 if (day.startsWith(monthKey)) bonusCount += getBonusInfo(day).total;
             });
-            const offsetPoints = bonusCount * 2;
+            const offsetPoints = Math.floor(bonusCount / 2);
             const netPoints = Math.max(0, penaltyPoints - offsetPoints);
             const saving = getPenaltySavingAmount(netPoints);
             return { monthKey, penaltyPoints, bonusCount, offsetPoints, netPoints, saving };
