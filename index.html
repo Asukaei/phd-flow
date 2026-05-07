@@ -959,6 +959,29 @@
                         </div>
                         <div class="relative w-full h-[220px] sm:h-[260px]"><canvas id="chart-bonus-penalty-mix"></canvas></div>
                     </div>
+                    <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm mb-4 sm:mb-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                            <div>
+                                <h3 class="text-sm sm:text-base font-black text-textmain">每月储蓄结算</h3>
+                                <p class="text-xs text-gray-500 font-medium mt-1">按月汇总惩罚点、Bonus 抵扣和应强制储蓄金额。</p>
+                            </div>
+                            <span class="text-xs font-bold text-gray-400">近 12 个月</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-xs sm:text-sm text-left">
+                                <thead class="text-gray-500 bg-gray-50 uppercase font-bold">
+                                    <tr>
+                                        <th class="px-4 py-3 w-28">月份</th>
+                                        <th class="px-4 py-3 text-right">惩罚点</th>
+                                        <th class="px-4 py-3 text-right">Bonus</th>
+                                        <th class="px-4 py-3 text-right">净惩罚点</th>
+                                        <th class="px-4 py-3 text-right">应储蓄</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" id="monthly-saving-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         <div class="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
                             <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3 sm:mb-4">深度专注时长 (h)</h3>
@@ -1437,7 +1460,8 @@
         function getTotalBonusCount() {
             const allDates = new Set([
                 ...Object.keys(D.checkinData || {}),
-                ...Object.keys(D.bonusData?.records || {})
+                ...Object.keys(D.bonusData?.records || {}),
+                ...Object.keys(D.taskData || {})
             ]);
             return Array.from(allDates).reduce((sum, dateStr) => sum + getBonusInfo(dateStr).total, 0);
         }
@@ -1576,7 +1600,8 @@
             });
             const allDates = new Set([
                 ...Object.keys(D.checkinData || {}),
-                ...Object.keys(D.bonusData?.records || {})
+                ...Object.keys(D.bonusData?.records || {}),
+                ...Object.keys(D.taskData || {})
             ]);
             Array.from(allDates).forEach(day => {
                 if (day.startsWith(monthKey)) bonusCount += getBonusInfo(day).total;
@@ -1585,6 +1610,25 @@
             const netPoints = Math.max(0, penaltyPoints - offsetPoints);
             const saving = getPenaltySavingAmount(netPoints);
             return { monthKey, penaltyPoints, bonusCount, offsetPoints, netPoints, saving };
+        }
+
+        function getMonthlySavingSettlements(limit = 12) {
+            const monthKeys = new Set([getMonthKey()]);
+            [
+                D.penaltyData?.records,
+                D.bonusData?.records,
+                D.checkinData,
+                D.taskData
+            ].forEach(source => {
+                Object.keys(source || {}).forEach(dateStr => {
+                    const monthKey = getMonthKey(dateStr);
+                    if (/^\d{4}-\d{2}$/.test(monthKey)) monthKeys.add(monthKey);
+                });
+            });
+            return Array.from(monthKeys)
+                .sort((a, b) => b.localeCompare(a))
+                .slice(0, limit)
+                .map(monthKey => getMonthlySettlement(monthKey));
         }
 
         function isProbablyMobileDevice() {
@@ -3174,7 +3218,30 @@
 
             const statsDatePicker = document.getElementById('stats-bonus-date-picker');
             if (statsDatePicker) renderStatsBonusDetails(statsDatePicker.value || getTodayStr());
+            renderMonthlySavingOverview();
             renderStatsDateOverview();
+        }
+
+        function renderMonthlySavingOverview() {
+            const list = document.getElementById('monthly-saving-list');
+            if (!list) return;
+            const settlements = getMonthlySavingSettlements();
+            list.innerHTML = '';
+            settlements.forEach(item => {
+                const monthLabel = `${item.monthKey.slice(0, 4)}年${Number(item.monthKey.slice(5, 7))}月`;
+                const savingClass = item.saving > 0 ? 'text-amber-600' : 'text-gray-400';
+                list.innerHTML += `
+                    <tr>
+                        <td class="px-4 py-3 font-black text-textmain whitespace-nowrap">${monthLabel}</td>
+                        <td class="px-4 py-3 text-right font-bold text-danger">${item.penaltyPoints}</td>
+                        <td class="px-4 py-3 text-right font-bold text-warning">${item.bonusCount}</td>
+                        <td class="px-4 py-3 text-right font-bold text-textmain">${item.netPoints}</td>
+                        <td class="px-4 py-3 text-right font-black ${savingClass}">${item.saving} 元</td>
+                    </tr>`;
+            });
+            if (!list.innerHTML) {
+                list.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-400 text-sm">暂无月度结算数据</td></tr>';
+            }
         }
 
         function renderStatsPenaltyDetails(dateStr = getTodayStr()) {
