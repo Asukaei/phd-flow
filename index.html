@@ -568,7 +568,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="today-checkin-table">
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">工位考勤</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:00-09:30</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00 及以后</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-out">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-bonus">-</td>
+                                        <td class="px-4 sm:px-6 py-3 font-bold text-gray-700">工位考勤</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">09:30 及以前</td><td class="px-4 sm:px-6 py-3 text-gray-500 text-xs sm:text-sm">20:00 及以后</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-in">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-out">-</td><td class="px-4 sm:px-6 py-3 font-medium text-gray-800" id="td-work-bonus">-</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -2172,7 +2172,7 @@
 
         function isWorkCheckInOk(timeStr) {
             const minutes = parseTimeToMinutes(timeStr);
-            return minutes !== null && minutes >= 9 * 60 && minutes <= 9 * 60 + 30;
+            return minutes !== null && minutes <= 9 * 60 + 30;
         }
 
         function isWorkCheckOutOk(timeStr) {
