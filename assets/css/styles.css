@@ -1,0 +1,329 @@
+@layer utilities {
+            .btn-shadow { box-shadow: 0 4px 0 0 rgba(0,0,0,0.08); transition: all 0.2s; }
+            .btn-shadow:active { transform: translateY(4px); box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+            .achievement-popup { animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.5s ease-in 5.5s forwards; }
+            @keyframes slideDown { 0% { transform: translate(-50%, -150%); opacity: 0; } 100% { transform: translate(-50%, -50%); opacity: 1; } }
+            @keyframes fadeOut { 0% { transform: translate(-50%, -50%); opacity: 1; } 100% { transform: translate(-50%, -150%); opacity: 0; } }
+            input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+            .soft-card { background: white; border-radius: 1rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bbaecc; }
+
+        /* iOS 适配补丁 */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: max(1rem, env(safe-area-inset-top));
+                padding-bottom: max(2rem, env(safe-area-inset-bottom));
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
+        /* 强制输入框字体不小于 16px，避免 iOS 自动放大导致布局抖动 */
+        input, select, textarea { font-size: 16px !important; }
+        * { -webkit-tap-highlight-color: transparent; }
+        .focus-reminder-backdrop { backdrop-filter: blur(14px); background: rgba(34, 44, 67, 0.48); }
+        .focus-reminder-card { background: radial-gradient(circle at top left, rgba(255,255,255,0.96), rgba(245,246,248,0.98) 38%, rgba(232,238,247,0.98) 100%); box-shadow: 0 24px 80px -24px rgba(61, 85, 122, 0.45); }
+        .focus-reminder-ring { background: conic-gradient(from 210deg, rgba(159,188,219,0.18), rgba(187,174,204,0.95), rgba(238,203,168,0.9), rgba(159,188,219,0.18)); }
+        .focus-reminder-show { animation: focusReminderIn 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        .focus-leave-card { background: linear-gradient(145deg, rgba(255,248,247,0.98), rgba(255,255,255,0.98) 45%, rgba(250,242,240,0.98)); box-shadow: 0 30px 90px -28px rgba(148, 84, 74, 0.38); }
+        .focus-leave-pill { background: linear-gradient(135deg, rgba(224,162,162,0.16), rgba(238,203,168,0.22)); }
+        .focus-leave-danger { background: linear-gradient(135deg, #d88f8f, #cf7777); }
+        .focus-leave-safe { background: linear-gradient(135deg, #b8accb, #9fbcdb); }
+        .focus-stage {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.72);
+            background:
+                radial-gradient(circle at 16% 18%, rgba(255,255,255,0.24), rgba(255,255,255,0) 26%),
+                radial-gradient(circle at 82% 14%, rgba(238,203,168,0.24), rgba(238,203,168,0) 22%),
+                radial-gradient(circle at 50% 120%, rgba(159,188,219,0.3), rgba(159,188,219,0) 42%),
+                linear-gradient(145deg, #1f2535 0%, #28314a 32%, #34435f 68%, #4a5874 100%);
+            box-shadow: 0 28px 90px -36px rgba(22, 28, 44, 0.85), inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+        .focus-stage::before,
+        .focus-stage::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+            filter: blur(10px);
+        }
+        .focus-stage::before {
+            width: 18rem;
+            height: 18rem;
+            top: -8rem;
+            left: -6rem;
+            background: rgba(187,174,204,0.18);
+        }
+        .focus-stage::after {
+            width: 20rem;
+            height: 20rem;
+            right: -8rem;
+            bottom: -10rem;
+            background: rgba(238,203,168,0.14);
+        }
+        .focus-stage-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.12));
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        .focus-stage-glow {
+            position: absolute;
+            inset: auto 8% 18% 8%;
+            height: 7rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(187,174,204,0.3), rgba(187,174,204,0) 68%);
+            filter: blur(16px);
+            pointer-events: none;
+        }
+        .focus-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+        }
+        .focus-kicker-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 999px;
+            background: #eecba8;
+            box-shadow: 0 0 0 6px rgba(238,203,168,0.12);
+        }
+        .focus-patience-word {
+            font-size: clamp(3.6rem, 15vw, 8.6rem);
+            line-height: 0.88;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #f8f6f1;
+            text-shadow: 0 10px 35px rgba(0,0,0,0.3);
+        }
+        .focus-patience-shadow {
+            position: absolute;
+            inset: auto 0 27%;
+            font-size: clamp(3.6rem, 15vw, 8.6rem);
+            line-height: 0.88;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.06);
+            transform: translateY(16%);
+            pointer-events: none;
+            user-select: none;
+        }
+        .focus-stage-panel {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            border-radius: 1.6rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(11, 16, 28, 0.24);
+            backdrop-filter: blur(14px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .focus-stage-time {
+            font-size: clamp(2.4rem, 9vw, 4.8rem);
+            line-height: 1;
+            letter-spacing: 0.12em;
+            color: #f8f6f1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.24);
+        }
+        .focus-stage-clock {
+            font-size: clamp(1.4rem, 5vw, 2.4rem);
+            line-height: 1;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.9);
+        }
+        .focus-stage-task {
+            font-size: clamp(1rem, 2.3vw, 1.35rem);
+            font-weight: 800;
+            color: rgba(255,255,255,0.96);
+        }
+        .focus-stage-meta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.5rem;
+            padding: 0.72rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        .focus-stage-btn {
+            min-height: 3.35rem;
+            border-radius: 1rem;
+        }
+        .focus-stage-btn-primary {
+            background: linear-gradient(135deg, #eecba8, #d7a77a);
+            color: #2f251f;
+            box-shadow: 0 18px 38px -24px rgba(238,203,168,0.9);
+        }
+        .focus-stage-btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .habit-progress-card {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(255,255,255,0.92), rgba(255,255,255,0) 26%),
+                radial-gradient(circle at 88% 8%, rgba(166,203,181,0.38), rgba(166,203,181,0) 30%),
+                linear-gradient(135deg, rgba(255,255,255,0.78), rgba(235,246,240,0.88));
+            backdrop-filter: blur(18px);
+            box-shadow: 0 22px 60px -34px rgba(62, 124, 91, 0.75), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .habit-progress-card::before,
+        .habit-progress-card::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            pointer-events: none;
+        }
+        .habit-progress-card::before {
+            width: 9rem;
+            height: 9rem;
+            right: -3rem;
+            top: -4.5rem;
+            background: rgba(166,203,181,0.22);
+            filter: blur(2px);
+        }
+        .habit-progress-card::after {
+            width: 12rem;
+            height: 12rem;
+            left: -5rem;
+            bottom: -6rem;
+            background: rgba(238,203,168,0.2);
+        }
+        .habit-progress-list {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            gap: 0.9rem;
+        }
+        .habit-progress-item {
+            background: rgba(255,255,255,0.76);
+            border: 1px solid rgba(255,255,255,0.86);
+            border-radius: 1.15rem;
+            padding: 0.85rem;
+            box-shadow: 0 16px 36px -30px rgba(62, 124, 91, 0.72);
+        }
+        .habit-progress-track {
+            position: relative;
+            height: 0.82rem;
+            overflow: visible;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(166,203,181,0.34);
+            box-shadow: inset 0 2px 7px rgba(85,120,102,0.08);
+        }
+        .habit-progress-fill {
+            position: relative;
+            height: 100%;
+            width: 0%;
+            min-width: 0;
+            border-radius: inherit;
+            overflow: hidden;
+            background:
+                linear-gradient(90deg, rgba(166,203,181,0.95), rgba(159,188,219,0.95), rgba(238,203,168,0.95)),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.28) 0 10px, rgba(255,255,255,0.06) 10px 20px);
+            box-shadow: 0 0 24px rgba(166,203,181,0.42);
+            transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .habit-progress-fill::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.52), transparent);
+            transform: translateX(-100%);
+            animation: habitProgressSweep 2.6s ease-in-out infinite;
+        }
+        .habit-progress-orb {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 1.45rem;
+            height: 1.45rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ffffff, #a6cbb5);
+            border: 3px solid rgba(255,255,255,0.92);
+            box-shadow: 0 12px 28px -14px rgba(51, 117, 78, 0.95);
+            transform: translate(-50%, -50%);
+            transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s ease;
+        }
+        .habit-progress-milestone {
+            position: absolute;
+            top: 50%;
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.95);
+            border: 2px solid rgba(166,203,181,0.72);
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        .habit-progress-milestone.reached {
+            background: #ebd59a;
+            border-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(235,213,154,0.22);
+        }
+        .habit-progress-complete .habit-progress-orb {
+            background: linear-gradient(135deg, #ffffff, #ebd59a);
+            animation: habitOrbPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes habitProgressSweep {
+            0% { transform: translateX(-100%); }
+            55%, 100% { transform: translateX(100%); }
+        }
+        @keyframes habitOrbPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        body.focus-manual-landscape {
+            overflow: hidden;
+            background: linear-gradient(135deg, #f4f2f8, #eef2f8);
+        }
+        body.focus-manual-landscape #current-task-container {
+            position: fixed !important;
+            top: 50%;
+            left: 50%;
+            z-index: 70;
+            width: 100dvh;
+            height: 100dvw;
+            max-width: none;
+            max-height: none;
+            margin: 0;
+            overflow: auto;
+            border-radius: 0;
+            transform: translate(-50%, -50%) rotate(90deg);
+            transform-origin: center center;
+            padding: 1.25rem;
+        }
+        body.focus-manual-landscape #current-task-container > div {
+            min-height: calc(100dvw - 2.5rem);
+            justify-content: center;
+        }
+        @keyframes focusReminderIn {
+            0% { transform: translateY(20px) scale(0.96); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
