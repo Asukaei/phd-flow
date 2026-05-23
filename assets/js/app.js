@@ -258,6 +258,8 @@
                 title: typeof plan?.title === 'string' ? plan.title : '长期任务',
                 detail: typeof plan?.detail === 'string' ? plan.detail : '',
                 createdAt: plan?.createdAt || new Date().toISOString(),
+                completed: !!(plan?.completed || plan?.done),
+                completedAt: typeof plan?.completedAt === 'string' ? plan.completedAt : '',
                 children: Array.isArray(plan?.children) ? plan.children.map(child => ({
                     id: child?.id || `lpc_${Date.now()}`,
                     name: typeof child?.name === 'string' ? child.name : '拆解任务',
@@ -1221,6 +1223,7 @@
                 });
 
             latestTodoByLineage.forEach(({ todo, dateStr }, lineageId) => {
+                if (todo.planId && isLongPlanCompleted(getLongPlanById(todo.planId))) return;
                 if (todo.done || todayLineages.has(lineageId)) return;
                 todayTodos.push({
                     id: `td_${Date.now()}_${carryIndex++}`,
@@ -1477,6 +1480,10 @@
             return (D.longPlanData?.plans || []).find(plan => plan.id === planId) || null;
         }
 
+        function isLongPlanCompleted(plan) {
+            return !!(plan?.completed || plan?.done);
+        }
+
         function getLongPlanTitle(planId) {
             return getLongPlanById(planId)?.title || '';
         }
@@ -1512,6 +1519,7 @@
             let changed = false;
 
             (D.longPlanData?.plans || []).forEach(plan => {
+                if (isLongPlanCompleted(plan)) return;
                 (plan.children || []).forEach(child => {
                     if (child.done || todayChildIds.has(child.id)) return;
                     todayTodos.push(createTodoFromLongPlanChild(plan, child, targetDateStr));
@@ -1567,6 +1575,7 @@
             if (!select) return;
             const options = ['<option value="">不关联长期任务</option>'];
             (D.longPlanData?.plans || []).forEach(plan => {
+                if (isLongPlanCompleted(plan)) return;
                 options.push(`<option value="${plan.id}" ${selectedPlanId === plan.id ? 'selected' : ''}>${escapeHtml(plan.title)}</option>`);
             });
             select.innerHTML = options.join('');
@@ -1575,7 +1584,7 @@
         function renderLongPlans() {
             const container = document.getElementById('long-plan-list-container');
             if (!container) return;
-            const plans = D.longPlanData?.plans || [];
+            const plans = (D.longPlanData?.plans || []).filter(plan => !isLongPlanCompleted(plan));
             renderTodoPlanOptions(document.getElementById('todo-plan-select')?.value || '');
             if (!plans.length) {
                 container.innerHTML = '<div class="text-center text-gray-400 text-sm py-6">还没有长期任务，先建立一个长期目标</div>';
@@ -1607,7 +1616,12 @@
                                 </div>
                                 ${plan.detail ? `<div class="text-xs sm:text-sm text-textmuted leading-6 whitespace-pre-wrap">${escapeHtml(plan.detail)}</div>` : ''}
                             </div>
-                            <button class="text-gray-300 hover:text-danger p-1.5" onclick="deleteLongPlan('${plan.id}')" title="删除长期任务"><i class="fa fa-trash"></i></button>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <label class="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-success/10 cursor-pointer transition-colors" title="彻底完成长期任务">
+                                    <input type="checkbox" class="w-4 h-4 accent-green-500 cursor-pointer" onchange="completeLongPlan('${plan.id}')">
+                                </label>
+                                <button class="text-gray-300 hover:text-danger p-1.5" onclick="deleteLongPlan('${plan.id}')" title="删除长期任务"><i class="fa fa-trash"></i></button>
+                            </div>
                         </div>
                         <div class="flex gap-2 mb-3">
                             <input type="text" id="long-plan-child-input-${plan.id}" placeholder="拆一个子任务，比如：补完方法部分结构" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-primary">
@@ -1636,6 +1650,8 @@
                     title,
                     detail,
                     createdAt: new Date().toISOString(),
+                    completed: false,
+                    completedAt: '',
                     children: []
                 });
                 longPlanTitleInput.value = '';
@@ -1748,6 +1764,20 @@
             const t = getTodayStr();
             D.todoData[t] = D.todoData[t].filter(x => x.id !== id);
             saveData(); renderTodos();
+        };
+
+        window.completeLongPlan = function(planId) {
+            const plan = getLongPlanById(planId);
+            if (!plan) return;
+            if (!confirm('确认这个长期任务已经彻底完成？完成后它会从主页长期规划列表中隐藏。')) {
+                renderLongPlans();
+                return;
+            }
+            plan.completed = true;
+            plan.completedAt = new Date().toISOString();
+            saveData();
+            renderLongPlans();
+            renderTodoPlanOptions();
         };
 
         window.deleteLongPlan = function(planId) {
